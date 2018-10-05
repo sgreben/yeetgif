@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"math"
+	"sync"
 )
 
 func OpaqueBounds(img image.Image, threshold uint8) image.Rectangle {
@@ -12,6 +13,7 @@ func OpaqueBounds(img image.Image, threshold uint8) image.Rectangle {
 	out := image.Rectangle{}
 	first := true
 	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
+	var mu sync.Mutex
 	parallel(0, src.h, func(ys <-chan int) {
 		for y := range ys {
 			i := y * dst.Stride
@@ -20,15 +22,19 @@ func OpaqueBounds(img image.Image, threshold uint8) image.Rectangle {
 				a := dst.Pix[i+3]
 				i += 4
 				if a > threshold && first {
+					mu.Lock()
 					out.Min = image.Point{x, y}
 					out.Max = out.Min
 					first = false
+					mu.Unlock()
 				}
 				if a > threshold && !first {
+					mu.Lock()
 					out.Min.X = int(math.Min(float64(x), float64(out.Min.X)))
 					out.Min.Y = int(math.Min(float64(y), float64(out.Min.Y)))
 					out.Max.X = int(math.Max(float64(x), float64(out.Max.X)))
 					out.Max.Y = int(math.Max(float64(y), float64(out.Max.Y)))
+					mu.Unlock()
 				}
 			}
 		}
@@ -319,9 +325,9 @@ func OpMinAlpha(r1, g1, b1, a1, r2, g2, b2, a2 float64) (r, g, b, a float64) {
 }
 
 func OpMaxAlpha(r1, g1, b1, a1, r2, g2, b2, a2 float64) (r, g, b, a float64) {
-	r = r1
-	g = g1
-	b = b1
+	r = 255.0
+	g = 255.0
+	b = 255.0
 	a = math.Max(a1, a2)
 	return
 }

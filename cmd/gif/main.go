@@ -227,12 +227,15 @@ func init() {
 			random    = gifcmd.Float{Value: 0.5}
 			s         = gifcmd.Float{Value: 0.9}
 			h         = gifcmd.Float{Value: 0.8}
+			l         = gifcmd.Float{Value: 1.0}
 			a         = gifcmd.Float{Value: 0.8}
+			clip = cmd.BoolOpt("c clip", true, "clip flares to image alpha")
 			flares    = [][2]int{}
 			flaresVar = gifcmd.JSON{Value: &flares}
 		)
 		cmd.VarOpt("s scale", &s, "")
-		cmd.VarOpt("hue", &h, "")
+		cmd.VarOpt("u hue", &h, "")
+		cmd.VarOpt("l lightness", &l, "")
 		cmd.VarOpt("a alpha", &a, "")
 		cmd.VarOpt("r random", &random, "🌀")
 		cmd.VarArg("POINTS", &flaresVar, `flare locations, JSON, e.g. "[[123,456],[-100,23]]"`)
@@ -245,7 +248,7 @@ func init() {
 			if h.Text != "" {
 				hueWeight = 1.0
 			}
-			Woke(images, a.Value, h.Value, hueWeight, s.Value, random.Value, flarePoints)
+			Woke(images, a.Value, h.Value,  hueWeight, l.Value, s.Value, random.Value, flarePoints, *clip)
 		}
 	})
 
@@ -259,6 +262,7 @@ func init() {
 			q          = cmd.IntOpt("j jpeg", 84, "")
 			w          = cmd.IntOpt("w walk", 10, "🌀")
 			t          = gifcmd.Float{Value: 0.4}
+			n         = gifcmd.Float{Value: 1.0}
 			n1         = gifcmd.Float{Value: 0.02}
 			n2         = gifcmd.Float{Value: 0.5}
 			n3         = gifcmd.Float{Value: 0.1}
@@ -269,13 +273,17 @@ func init() {
 		cmd.VarOpt("a", &a, "🅰️")
 		cmd.VarOpt("b", &b, "🅱️")
 		cmd.VarOpt("c", &c, "🆑")
-		cmd.VarOpt("noise1", &n1, "🌀️")
-		cmd.VarOpt("noise2", &n2, "🌀️")
-		cmd.VarOpt("noise3", &n3, "🌀")
+		cmd.VarOpt("n noise", &n, "🌀️")
+		cmd.VarOpt("n1 noise1", &n1, "🌀️")
+		cmd.VarOpt("n2 noise2", &n2, "🌀️")
+		cmd.VarOpt("n3 noise3", &n3, "🌀")
 		cmd.VarOpt("u saturation", &saturation, "")
 		cmd.VarOpt("o contrast", &contrast, "")
 		cmd.VarOpt("t tint", &t, "tint")
 		cmd.Action = func() {
+			n1.Value *= n.Value
+			n2.Value *= n.Value
+			n3.Value *= n.Value
 			for i := 0; i < *iterations; i++ {
 				Fried(images, t.Value, a.Value, b.Value, c.Value, *q, *w, saturation.Value, contrast.Value, n1.Value, n2.Value, n3.Value, *clip)
 			}
@@ -611,9 +619,8 @@ func Shake(images []image.Image, random, frequency, amplitude float64) {
 }
 
 // Woke flares
-func Woke(images []image.Image, alpha, hue, hueWeight, scale, random float64, flares []image.Point) {
+func Woke(images []image.Image, alpha, hue, hueWeight, lightness, scale, random float64, flares []image.Point, clip bool) {
 	b := lensFlare.Bounds()
-	cutToAlpha := true // TODO: param
 	width := int(float64(b.Dx()) * scale)
 	height := int(float64(b.Dy()) * scale)
 	flare := imaging.Resize(lensFlare, width, height, imaging.Lanczos)
@@ -630,6 +637,7 @@ func Woke(images []image.Image, alpha, hue, hueWeight, scale, random float64, fl
 				flare = imaging.FlipV(imaging.FlipH(flare))
 			}
 			flare = imaging.AdjustHue(flare, hueWeight, hue)
+			flare = imaging.AdjustHSL(flare, hueWeight, 1.0, 1.0, lightness)
 			b := flare.Bounds()
 			layer = imaging.OverlayWithOp(layer, flare, image.Point{
 				X: (p.X - b.Dx()/2),
@@ -638,7 +646,7 @@ func Woke(images []image.Image, alpha, hue, hueWeight, scale, random float64, fl
 			flip = !flip
 		}
 		woke := imaging.OverlayWithOp(images[i], layer, image.Point{}, imaging.OpBlend(alpha))
-		if cutToAlpha {
+		if clip {
 			images[i] = imaging.OverlayWithOp(
 				woke,
 				images[i],
@@ -785,7 +793,7 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 	colorsStep := 16
 	var resizeArg *string
 	if w > 0 && h > 0 {
-		arg := fmt.Sprintf("--resize=%dx%d", w, h)
+		arg := fmt.Sprintf("--resize-fit=%dx%d", w, h)
 		resizeArg = &arg
 	}
 	inputBuf := &bytes.Buffer{}
@@ -883,11 +891,9 @@ func Crop(images []image.Image, threshold float64, auto bool) {
 		sample = imaging.OverlayWithOp(sample, images[i], image.Point{}, imaging.OpMaxAlpha)
 	}
 	b := imaging.OpaqueBounds(sample, uint8(threshold*255))
-	log.Println(b.Dx(),b.Dy())
-	crop := func(i int ) {
-		cropped := imaging.New(b.Dx(), b.Dy(), color.Transparent)
-		images[i] = imaging.PasteCenter(cropped, images[i])
-		images[i] = imaging.CropCenter(images[i], b.Dx(), b.Dy())
+	log.Println(b)
+	crop := func(i int) {
+		images[i] = imaging.Crop(images[i], b)
 	}
 	parallel(len(images), crop)
 }
