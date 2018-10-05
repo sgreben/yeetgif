@@ -3,7 +3,7 @@
 APP=gif
 NAME := yeetgif
 REPOSITORY := quay.io/sergey_grebenshchikov/$(NAME)
-VERSION := 1.0.0
+VERSION := 1.0.1
 VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)")
 
 PACKAGES := $(shell go list -f {{.Dir}} ./...)
@@ -20,17 +20,20 @@ push: build
 all: build push
 
 # go get -u github.com/github/hub
-release: zip
+release: zip README.md
 	git reset
 	dep ensure
 	git add vendor
 	git add Gopkg.toml Gopkg.lock
 	git commit -m "dep ensure" || true
 	git reset
-	git add Makefile
+	git add README.template.md README.md Makefile
 	git commit -m "Release $(VERSION)" || true
 	git push
 	hub release create $(VERSION) -m "$(VERSION)" -a release/$(APP)_$(VERSION)_osx_x86_64.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_64.zip -a release/$(APP)_$(VERSION)_linux_x86_64.tar.gz -a release/$(APP)_$(VERSION)_osx_x86_32.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_32.zip -a release/$(APP)_$(VERSION)_linux_x86_32.tar.gz -a release/$(APP)_$(VERSION)_linux_arm64.tar.gz
+
+README.md:
+	sed "s/\$${VERSION}/$(VERSION)/g;s/\$${APP}/$(APP)/g;" README.template.md > README.md
 
 zip: release/$(APP)_$(VERSION)_osx_x86_64.tar.gz release/$(APP)_$(VERSION)_windows_x86_64.zip release/$(APP)_$(VERSION)_linux_x86_64.tar.gz release/$(APP)_$(VERSION)_osx_x86_32.tar.gz release/$(APP)_$(VERSION)_windows_x86_32.zip release/$(APP)_$(VERSION)_linux_x86_32.tar.gz release/$(APP)_$(VERSION)_linux_arm64.tar.gz
 
