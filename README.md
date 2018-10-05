@@ -10,16 +10,16 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.3/gif_1.0.3_linux_x86_64.zip
-unzip gif_1.0.3_linux_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.4/gif_1.0.4_linux_x86_64.zip
+unzip gif_1.0.4_linux_x86_64.zip
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.3/gif_1.0.3_osx_x86_64.zip
-unzip gif_1.0.3_osx_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.4/gif_1.0.4_osx_x86_64.zip
+unzip gif_1.0.4_osx_x86_64.zip
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.3/gif_1.0.3_windows_x86_64.zip
-unzip gif_1.0.3_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.4/gif_1.0.4_windows_x86_64.zip
+unzip gif_1.0.4_windows_x86_64.zip
 ```
 
 ## Use it
@@ -34,7 +34,10 @@ unzip gif_1.0.3_windows_x86_64.zip
 ## Usage
 
 ```text
-gif [OPTIONS] COMMAND [arg...]
+
+Usage: gif [OPTIONS] COMMAND [arg...]
+
+v1.0.0-32f76fdf8817692838c799f5c2f766cc47f5e70d
 
 Options:
   -n                 Duplicate a single input image this many times (default 20)
@@ -54,6 +57,7 @@ Commands:
   hue                ( ͡☆ ͜ʖ ͡☆)
   tint               🎨༼ຈل͜ຈ༽
   resize             (° ͜ʖ°)¯\_( ͡☉ ͜ʖ ͡☉)_/¯
+  crop               ʖ ͡☉)
   optimize           👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
 

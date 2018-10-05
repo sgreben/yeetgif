@@ -34,7 +34,10 @@ unzip gif_${VERSION}_windows_x86_64.zip
 ## Usage
 
 ```text
-gif [OPTIONS] COMMAND [arg...]
+
+Usage: gif [OPTIONS] COMMAND [arg...]
+
+v1.0.0-32f76fdf8817692838c799f5c2f766cc47f5e70d
 
 Options:
   -n                 Duplicate a single input image this many times (default 20)
@@ -54,6 +57,7 @@ Commands:
   hue                ( ͡☆ ͜ʖ ͡☆)
   tint               🎨༼ຈل͜ຈ༽
   resize             (° ͜ʖ°)¯\_( ͡☉ ͜ʖ ͡☉)_/¯
+  crop               ʖ ͡☉)
   optimize           👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
 
