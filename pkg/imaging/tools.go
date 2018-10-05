@@ -7,6 +7,35 @@ import (
 	"math"
 )
 
+func OpaqueBounds(img image.Image, threshold uint8) image.Rectangle {
+	src := newScanner(img)
+	out := image.Rectangle{}
+	first := true
+	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
+	parallel(0, src.h, func(ys <-chan int) {
+		for y := range ys {
+			i := y * dst.Stride
+			src.scan(0, y, src.w, y+1, dst.Pix[i:i+src.w*4])
+			for x := 0; x < src.w; x++ {
+				a := dst.Pix[i+3]
+				i += 4
+				if a > threshold && first {
+					out.Min = image.Point{x, y}
+					out.Max = out.Min
+					first = false
+				}
+				if a > threshold && !first {
+					out.Min.X = int(math.Min(float64(x), float64(out.Min.X)))
+					out.Min.Y = int(math.Min(float64(y), float64(out.Min.Y)))
+					out.Max.X = int(math.Max(float64(x), float64(out.Max.X)))
+					out.Max.Y = int(math.Max(float64(y), float64(out.Max.Y)))
+				}
+			}
+		}
+	})
+	return out
+}
+
 // New creates a new image with the specified width and height, and fills it with the specified color.
 func New(width, height int, fillColor color.Color) *image.NRGBA {
 	if width <= 0 || height <= 0 {
@@ -286,6 +315,14 @@ func OpMinAlpha(r1, g1, b1, a1, r2, g2, b2, a2 float64) (r, g, b, a float64) {
 	g = g1
 	b = b1
 	a = math.Min(a1, a2)
+	return
+}
+
+func OpMaxAlpha(r1, g1, b1, a1, r2, g2, b2, a2 float64) (r, g, b, a float64) {
+	r = r1
+	g = g1
+	b = b1
+	a = math.Max(a1, a2)
 	return
 }
 

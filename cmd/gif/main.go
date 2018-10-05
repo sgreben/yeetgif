@@ -1,6 +1,8 @@
 package main
 
 import (
+	"regexp"
+	"strings"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -41,8 +43,16 @@ type configuration struct {
 	NoOutput          bool
 }
 
+type metaEntry struct {
+	AppName string `json:"appName"`
+	Timestamp string `json:"timestamp"`
+	Args []string `json:"args"`
+	Version string `json:"version"`
+}
+
 var config configuration
 var version string
+var noQuotesRegex = regexp.MustCompile("\\S")
 
 const (
 	appName         = "gif"
@@ -55,7 +65,9 @@ const (
 	commandFried    = "fried"
 	commandResize   = "resize"
 	commandHue      = "hue"
+	commandTint      = "tint"
 	commandOptimize = "optimize"
+	commandCrop ="crop"
 	commandMeta     = "meta"
 )
 
@@ -69,7 +81,9 @@ var commands = []string{
 	commandFried,
 	commandResize,
 	commandHue,
+	commandTint,
 	commandOptimize,
+	commandCrop,
 	commandMeta,
 }
 
@@ -283,6 +297,22 @@ func init() {
 		}
 	})
 
+	app.Command(commandTint, "🎨༼ຈل͜ຈ༽", func(cmd *cli.Cmd) {
+		cmd.Spec = "[OPTIONS]"
+		var (
+			f    = gifcmd.Float{Value: 1.0}
+			a    = gifcmd.Float{Value: 0.95}
+			from = gifcmd.Float{Value: 0.7}
+			to   = gifcmd.Float{Value: 0.9}
+		)
+		cmd.VarOpt("f frequency", &f, "")
+		cmd.VarOpt("0 from", &from, "")
+		cmd.VarOpt("1 to", &to, "")
+		cmd.VarOpt("i intensity", &a, "")
+		cmd.Action = func() {
+			TintPulse(images, f.Value, a.Value, from.Value, to.Value)
+		}
+	})
 	app.Command(commandResize, "(° ͜ʖ°)¯\\_( ͡☉ ͜ʖ ͡☉)_/¯", func(cmd *cli.Cmd) {
 		cmd.Spec = "[OPTIONS]"
 		var (
@@ -302,6 +332,17 @@ func init() {
 		}
 	})
 
+	app.Command(commandCrop, "ʖ ͡☉)", func(cmd *cli.Cmd) {
+		cmd.Spec = "[OPTIONS]"
+		var (
+			t = gifcmd.Float{Value: 0.0}
+		)
+		cmd.VarOpt("t threshold", &t, "")
+		cmd.Action = func() {
+			Crop(images, t.Value, true)
+		}
+	})
+
 	app.Command(commandOptimize, "👌( ͡ᵔ ͜ʖ ͡ᵔ )👌", func(cmd *cli.Cmd) {
 		cmd.Spec = "[OPTIONS]"
 		var (
@@ -316,17 +357,34 @@ func init() {
 
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", func(cmd *cli.Cmd) {
 		cmd.Command("show", "show 🧠", func(cmd *cli.Cmd) {
+			raw := cmd.BoolOpt("r raw", false, "print raw JSON")
 			cmd.Action = func() {
 				config.NoOutput = true
 				for _, e := range meta {
 					if e.Type == gifmeta.Comment {
-						fmt.Println(e.String())
+						s := e.String()
+						m := metaEntry{AppName: appName}
+						err := json.NewDecoder(strings.NewReader(s)).Decode(&m)
+						printRaw := *raw || err != nil
+						if printRaw {
+							fmt.Println(s)
+							continue
+						}
+						fmt.Printf("[%s] %s ", m.Timestamp, m.AppName)
+						for _, arg := range m.Args {
+							if noQuotesRegex.MatchString(arg) {
+								fmt.Printf("%s ", arg)
+								continue
+							}
+							fmt.Printf("%q ", arg)
+						}
+						fmt.Println()
 					}
 				}
 			}
 		})
 		cmd.Command("add", "add 🧠", func(cmd *cli.Cmd) {
-			d := cmd.StringArg("DATA", "", "Metadata to add")
+			d := cmd.StringArg("DATA", "", "")
 			cmd.Action = func() {
 				meta = append(meta, gifmeta.Extension{
 					Type:   gifmeta.Comment,
@@ -343,6 +401,7 @@ func init() {
 	})
 }
 
+// Decode images from `r`
 func Decode(r io.Reader) []image.Image {
 	var images []image.Image
 	input := &bytes.Buffer{}
@@ -380,6 +439,7 @@ func Decode(r io.Reader) []image.Image {
 	return images
 }
 
+// Duplicate the `images` n times
 func Duplicate(n int, images []image.Image) (out []image.Image) {
 	for i := 0; i < n+1; i++ {
 		out = append(out, images...)
@@ -387,6 +447,7 @@ func Duplicate(n int, images []image.Image) (out []image.Image) {
 	return out
 }
 
+// Encode the `images` as a GIF to `w`
 func Encode(w io.Writer, images []image.Image) error {
 	var maxWidth, maxHeight int
 	for _, img := range images {
@@ -424,10 +485,11 @@ func Encode(w io.Writer, images []image.Image) error {
 	}
 	buf := &bytes.Buffer{}
 	gif.EncodeAll(buf, &out)
-	metaJSONBytes, _ := json.Marshal(map[string]interface{}{
-		"timestamp": time.Now().Format(time.RFC3339),
-		"args":      os.Args[1:],
-		"version":   version,
+	metaJSONBytes, _ := json.Marshal(metaEntry{
+		AppName: appName,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Args:      os.Args[1:],
+		Version:   version,
 	})
 	meta = append(meta, gifmeta.Extension{
 		Type:   gifmeta.Comment,
@@ -436,6 +498,7 @@ func Encode(w io.Writer, images []image.Image) error {
 	return gifmeta.Append(w, buf, meta...)
 }
 
+// Roll the `images` `rev` times
 func Roll(images []image.Image, rev float64) {
 	n := len(images)
 	rotate := func(i int) {
@@ -456,6 +519,7 @@ func Roll(images []image.Image, rev float64) {
 	parallel(len(images), rotate)
 }
 
+// Wobble `images` `frequency` times by `amplitude` degrees
 func Wobble(images []image.Image, frequency, amplitude float64) {
 	n := len(images)
 	rotate := func(i int) {
@@ -476,6 +540,7 @@ func Wobble(images []image.Image, frequency, amplitude float64) {
 	parallel(len(images), rotate)
 }
 
+// Pulse `images` `frequency` times between scales `from` and `to`
 func Pulse(images []image.Image, frequency, from, to float64) {
 	n := len(images)
 	scale := func(i int) {
@@ -499,6 +564,7 @@ func Pulse(images []image.Image, frequency, from, to float64) {
 	parallel(len(images), scale)
 }
 
+// Zoom `images` once from `from` to `to`
 func Zoom(images []image.Image, from, to float64) {
 	n := len(images)
 	scale := func(i int) {
@@ -520,6 +586,7 @@ func Zoom(images []image.Image, from, to float64) {
 	parallel(len(images), scale)
 }
 
+// Shake `images`
 func Shake(images []image.Image, random, frequency, amplitude float64) {
 	n := len(images)
 	phaseY := math.Pi / 2
@@ -543,6 +610,7 @@ func Shake(images []image.Image, random, frequency, amplitude float64) {
 	parallel(len(images), move)
 }
 
+// Woke flares
 func Woke(images []image.Image, alpha, hue, hueWeight, scale, random float64, flares []image.Point) {
 	b := lensFlare.Bounds()
 	cutToAlpha := true // TODO: param
@@ -584,6 +652,7 @@ func Woke(images []image.Image, alpha, hue, hueWeight, scale, random float64, fl
 	parallel(len(images), woke)
 }
 
+// Fried meme
 func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturation, contrast, noise1, noise2, noise3 float64, clip bool) {
 	if loss < 0 {
 		loss = 0
@@ -636,6 +705,7 @@ func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturati
 	parallel(len(images), fry)
 }
 
+// Resize by
 func ResizeScale(images []image.Image, scale float64) {
 	for i := range images {
 		b := images[i].Bounds()
@@ -644,6 +714,7 @@ func ResizeScale(images []image.Image, scale float64) {
 	}
 }
 
+// Resize to
 func ResizeTarget(images []image.Image, width, height float64) {
 	for i := range images {
 		b := images[i].Bounds()
@@ -717,12 +788,13 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 		arg := fmt.Sprintf("--resize=%dx%d", w, h)
 		resizeArg = &arg
 	}
-	buf := &bytes.Buffer{}
-	err := Encode(buf, images)
+	inputBuf := &bytes.Buffer{}
+	err := Encode(inputBuf, images)
 	if err != nil {
 		log.Fatalf("encode: %v", err)
 	}
-	r := bytes.NewReader(buf.Bytes())
+	outputBuf := &bytes.Buffer{}
+	r := bytes.NewReader(inputBuf.Bytes())
 	for colors := maxColors + colorsStep; colors > 0; colors -= colorsStep {
 		var colorsArg *string
 		if colors <= maxColors {
@@ -730,7 +802,7 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 			colorsArg = &arg
 		}
 		for loss := 0; loss <= maxLoss; loss += lossStep {
-			buf.Reset()
+			outputBuf.Reset()
 			r.Seek(0, io.SeekStart)
 			args := []string{fmt.Sprintf("--lossy=%d", loss)}
 			if resizeArg != nil {
@@ -752,23 +824,26 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			io.Copy(in, r)
+			_, err = io.Copy(in, r)
+			if err != nil {
+				log.Fatal(err)
+			}
 			err = in.Close()
 			if err != nil {
 				log.Fatal(err)
 			}
-			n, err := io.Copy(buf, out)
+			n, err := io.Copy(outputBuf, out)
 			if err != nil {
 				log.Fatal(err)
 			}
-			sizeKB := n / 1024
 			err = cmd.Wait()
 			if err != nil {
 				log.Fatal(err)
 			}
+			sizeKB := n / 1024
 			log.Printf("%v: %dKB", cmd.Args, sizeKB)
 			if sizeKB <= kb {
-				encoded = buf.Bytes()
+				encoded = outputBuf.Bytes()
 				images = images[:0]
 				return
 			}
@@ -791,6 +866,30 @@ func Pad(images []image.Image) {
 		padded := imaging.New(width, height, color.Transparent)
 		images[i] = imaging.PasteCenter(padded, images[i])
 	}
+}
+
+func Crop(images []image.Image, threshold float64, auto bool) {
+	width, height := 0, 0
+	for i := range images {
+		if w := images[i].Bounds().Dx(); w > width {
+			width = w
+		}
+		if h := images[i].Bounds().Dy(); h > height {
+			height = h
+		}
+	}
+	sample := imaging.Clone(images[0])
+	for i := range images {
+		sample = imaging.OverlayWithOp(sample, images[i], image.Point{}, imaging.OpMaxAlpha)
+	}
+	b := imaging.OpaqueBounds(sample, uint8(threshold*255))
+	log.Println(b.Dx(),b.Dy())
+	crop := func(i int ) {
+		cropped := imaging.New(b.Dx(), b.Dy(), color.Transparent)
+		images[i] = imaging.PasteCenter(cropped, images[i])
+		images[i] = imaging.CropCenter(images[i], b.Dx(), b.Dy())
+	}
+	parallel(len(images), crop)
 }
 
 func parallel(n int, f func(int)) {
