@@ -1,9 +1,9 @@
-.PHONY: build push all README.md
+.PHONY: build push all README.md clean
 
 APP=gif
 NAME := yeetgif
 REPOSITORY := quay.io/sergey_grebenshchikov/$(NAME)
-VERSION := 1.0.5
+VERSION := 1.0.6
 VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)")
 
 PACKAGES := $(shell go list -f {{.Dir}} ./...)
@@ -18,6 +18,9 @@ push: build
 	docker push $(REPOSITORY):$(VERSION)
 
 all: build push
+
+clean:
+	rm -rf binaries zip
 
 # go get -u github.com/github/hub
 release: zip README.md

@@ -10,14 +10,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.5/gif_1.0.5_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.6/gif_1.0.6_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.5/gif_1.0.5_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.6/gif_1.0.6_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.5/gif_1.0.5_windows_x86_64.zip
-unzip gif_1.0.5_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.6/gif_1.0.6_windows_x86_64.zip
+unzip gif_1.0.6_windows_x86_64.zip
 ```
 
 ## Use it
@@ -32,7 +32,6 @@ unzip gif_1.0.5_windows_x86_64.zip
 ## Usage
 
 ```text
-
 Usage: gif [OPTIONS] COMMAND [arg...]
 
 v1.0.0-32f76fdf8817692838c799f5c2f766cc47f5e70d
@@ -61,6 +60,7 @@ Commands:
 
 Run 'gif COMMAND --help' for more information on a command.
 ```
+
 
 ## Licensing
 

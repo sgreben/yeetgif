@@ -32,7 +32,6 @@ unzip gif_${VERSION}_windows_x86_64.zip
 ## Usage
 
 ```text
-
 Usage: gif [OPTIONS] COMMAND [arg...]
 
 v1.0.0-32f76fdf8817692838c799f5c2f766cc47f5e70d
@@ -61,6 +60,7 @@ Commands:
 
 Run 'gif COMMAND --help' for more information on a command.
 ```
+
 
 ## Licensing
 
