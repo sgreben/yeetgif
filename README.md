@@ -10,14 +10,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.8/gif_1.0.8_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.9/gif_1.0.9_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.8/gif_1.0.8_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.9/gif_1.0.9_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.8/gif_1.0.8_windows_x86_64.zip
-unzip gif_1.0.8_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.0.9/gif_1.0.9_windows_x86_64.zip
+unzip gif_1.0.9_windows_x86_64.zip
 ```
 
 ## Use it
