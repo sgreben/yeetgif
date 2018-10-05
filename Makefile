@@ -10,7 +10,7 @@ PACKAGES := $(shell go list -f {{.Dir}} ./...)
 GOFILES  := $(addsuffix /*.go,$(PACKAGES))
 GOFILES  := $(wildcard $(GOFILES))
 
-build: Dockerfile gif.sh
+build: Dockerfile $(GOFILES)
 	docker build -t $(NAME) -t $(REPOSITORY):latest -t $(REPOSITORY):$(VERSION) .
 
 push: build
@@ -18,6 +18,19 @@ push: build
 	docker push $(REPOSITORY):$(VERSION)
 
 all: build push
+
+# go get -u github.com/github/hub
+release: zip
+	git reset
+	dep ensure
+	git add vendor
+	git add Gopkg.toml Gopkg.lock
+	git commit -m "dep ensure" || true
+	git reset
+	git add Makefile
+	git commit -m "Release $(VERSION)" || true
+	git push
+	hub release create $(VERSION) -m "$(VERSION)" -a release/$(APP)_$(VERSION)_osx_x86_64.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_64.zip -a release/$(APP)_$(VERSION)_linux_x86_64.tar.gz -a release/$(APP)_$(VERSION)_osx_x86_32.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_32.zip -a release/$(APP)_$(VERSION)_linux_x86_32.tar.gz -a release/$(APP)_$(VERSION)_linux_arm64.tar.gz
 
 zip: release/$(APP)_$(VERSION)_osx_x86_64.tar.gz release/$(APP)_$(VERSION)_windows_x86_64.zip release/$(APP)_$(VERSION)_linux_x86_64.tar.gz release/$(APP)_$(VERSION)_osx_x86_32.tar.gz release/$(APP)_$(VERSION)_windows_x86_32.zip release/$(APP)_$(VERSION)_linux_x86_32.tar.gz release/$(APP)_$(VERSION)_linux_arm64.tar.gz
 
