@@ -23,7 +23,7 @@ unzip gif_${VERSION}_windows_x86_64.zip
 ## Use it
 
 ```sh
-<doc/yeet.png | gif fried | gif wobble | gif crop | gif optimize >doc/yeet.gif
+<doc/yeet.png | gif fried | gif wobble | gif crop >doc/yeet.gif
 ```
 ![before](doc/yeet.png)
 ![after](doc/yeet.gif)
