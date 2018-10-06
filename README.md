@@ -32,18 +32,18 @@ unzip gif_1.2.0_windows_x86_64.zip
 ## Usage
 
 ```text
+
 Usage: gif [OPTIONS] COMMAND [arg...]
 
-v1.0.0-32f76fdf8817692838c799f5c2f766cc47f5e70d
-
-Options:
+                     
+Options:             
   -n                 Duplicate a single input image this many times (default 20)
   -q, --quiet        Disable all log output (stderr)
   -d, --delay-ms     Frame delay in milliseconds (default 20)
   -p, --pad          Pad images (default true)
       --write-meta   Write command line options into output GIF metadata (default true)
-
-Commands:
+                     
+Commands:            
   roll               (☭ ͜ʖ ☭)
   wobble             🍆( ͡° ͜ʖ ͡°)🍆
   pulse              ( ͡◉ ͜ʖ ͡◉)
@@ -54,10 +54,12 @@ Commands:
   hue                ( ͡☆ ͜ʖ ͡☆)
   tint               🎨༼ຈل͜ຈ༽
   resize             (° ͜ʖ°)¯\_( ͡☉ ͜ʖ ͡☉)_/¯
-  crop               ʖ ͡☉)
+  crop               ┬┴┬┴┤ ͜ʖ ͡°)
   optimize           👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
+  compose            (ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧
+  nop                
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
-
+                     
 Run 'gif COMMAND --help' for more information on a command.
 ```
 

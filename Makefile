@@ -1,4 +1,4 @@
-.PHONY: build push all README.md clean
+.PHONY: build push all README.md clean binary
 
 APP=gif
 NAME := yeetgif
@@ -35,8 +35,11 @@ release: zip README.md
 	git push
 	hub release create $(VERSION) -m "$(VERSION)" -a release/$(APP)_$(VERSION)_osx_x86_64.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_64.zip -a release/$(APP)_$(VERSION)_linux_x86_64.tar.gz -a release/$(APP)_$(VERSION)_osx_x86_32.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_32.zip -a release/$(APP)_$(VERSION)_linux_x86_32.tar.gz -a release/$(APP)_$(VERSION)_linux_arm64.tar.gz
 
-README.md:
-	sed "s/\$${VERSION}/$(VERSION)/g;s/\$${APP}/$(APP)/g;" README.template.md > README.md
+README.md: binary
+	<README.template.md subst USAGE="$$($(APP) -h 2>&1)" VERSION="$(VERSION)" APP="$(APP)" >README.md
+
+binary:
+	go install ./cmd/$(APP)
 
 zip: release/$(APP)_$(VERSION)_osx_x86_64.tar.gz release/$(APP)_$(VERSION)_windows_x86_64.zip release/$(APP)_$(VERSION)_linux_x86_64.tar.gz release/$(APP)_$(VERSION)_osx_x86_32.tar.gz release/$(APP)_$(VERSION)_windows_x86_32.zip release/$(APP)_$(VERSION)_linux_x86_32.tar.gz release/$(APP)_$(VERSION)_linux_arm64.tar.gz
 

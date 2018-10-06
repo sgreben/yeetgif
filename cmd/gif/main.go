@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/big"
 	"regexp"
 	"strings"
 	"bytes"
@@ -71,7 +72,9 @@ const (
 	commandTint      = "tint"
 	commandOptimize = "optimize"
 	commandCrop ="crop"
+	commandCompose ="compose"
 	commandMeta     = "meta"
+	commandNop     = "nop"
 )
 
 var commands = []string{
@@ -130,7 +133,7 @@ func init() {
 	cliOptions = fmt.Sprintf("%v ", os.Args[1:])
 	log.SetPrefix(cliOptions)
 	log.SetOutput(os.Stderr)
-	app = cli.App(appName, fmt.Sprintf("v%v", version))
+	app = cli.App(appName, fmt.Sprintf("%v", version))
 
 	var ( // Global flags
 		duplicate = app.IntOpt("n", 20, "Duplicate a single input image this many times")
@@ -155,6 +158,9 @@ func init() {
 			log.Fatal("no images read")
 		}
 		if len(images) == 1 {
+			if config.Duplicate > 0 {
+				config.Duplicate--
+			}
 			images = Duplicate(config.Duplicate, images)
 		}
 	}
@@ -163,10 +169,12 @@ func init() {
 		cmd.Spec = "[OPTIONS]"
 		var (
 			r = gifcmd.Float{Value: 1.0}
+			s = gifcmd.Float{Value: 1.0}
 		)
 		cmd.VarOpt("r revolutions", &r, "")
+		cmd.VarOpt("s scale", &s, "")
 		cmd.Action = func() {
-			Roll(images, r.Value)
+			Roll(images, r.Value, s.Value)
 		}
 	})
 
@@ -372,14 +380,14 @@ func init() {
 		}
 	})
 
-	app.Command(commandCrop, "ʖ ͡☉)", func(cmd *cli.Cmd) {
+	app.Command(commandCrop, "┬┴┬┴┤ ͜ʖ ͡°)", func(cmd *cli.Cmd) {
 		cmd.Spec = "[OPTIONS]"
 		var (
 			t = gifcmd.Float{Value: 0.0}
 		)
 		cmd.VarOpt("t threshold", &t, "")
 		cmd.Action = func() {
-			Crop(images, t.Value, true)
+			AutoCrop(images, t.Value)
 		}
 	})
 
@@ -393,6 +401,73 @@ func init() {
 		cmd.Action = func() {
 			Optimize(images, int64(*k), *w, *h)
 		}
+	})
+
+	app.Command(commandCompose, "(ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧", func(cmd *cli.Cmd) {
+		cmd.Spec = "[OPTIONS] INPUT"
+		const (
+			orderUnder = "under"
+			orderOver = "over"
+		)
+		const (
+			positionCenter = "center"
+			positionLeft = "left"
+			positionRight = "right"
+			positionTop = "top"
+			positionBottom = "bottom"
+			positionAbsolute = "abs"
+		)
+		var (
+			input = cmd.StringArg("INPUT", "", "")
+			z = gifcmd.Enum{
+				Choices: []string{orderUnder, orderOver},
+				Value: orderOver,
+			}
+			p = gifcmd.Enum{
+				Choices: []string{
+					positionCenter,
+					// positionLeft,
+					// positionRight,
+					// positionTop,
+					// positionBottom,
+					positionAbsolute,
+				},
+				Value: positionCenter,
+			}
+			x = cmd.IntOpt("x", 0, "")
+			y = cmd.IntOpt("y", 0, "")
+			s = gifcmd.Float{Value: 1.0}
+		)
+		cmd.VarOpt("z z-order", &z, "")
+		cmd.VarOpt("p position", &p, "")
+		cmd.VarOpt("s scale", &s, "")
+		cmd.Action = func() {
+			f, err := os.Open(*input)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			layer := Decode(f)
+			if s.Value != 1.0 {
+				ResizeScale(layer, s.Value)
+			}
+			var offset *image.Point
+			switch p.Value {
+			case positionAbsolute:
+				offset = &image.Point{*x,*y}
+			case positionCenter:
+				offset = nil
+			}
+			switch z.Value {
+			case orderOver:
+				Compose(images, layer, offset)
+			case orderUnder:
+				Compose(layer, images, offset)
+			}
+		}
+	})
+
+	app.Command(commandNop, "", func(cmd *cli.Cmd) {
 	})
 
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", func(cmd *cli.Cmd) {
@@ -545,11 +620,14 @@ func Encode(w io.Writer, images []image.Image) error {
 }
 
 // Roll the `images` `rev` times
-func Roll(images []image.Image, rev float64) {
+func Roll(images []image.Image, rev, preScale float64) {
 	n := len(images)
 	rotate := func(i int) {
 		angle := 360 * rev * float64(i) / float64(n)
 		bPre := images[i].Bounds()
+		if preScale != 1.0 {
+			images[i] = imaging.Resize(images[i], int(float64(bPre.Dx())*preScale), int(float64(bPre.Dy())*preScale), imaging.Lanczos)
+		}
 		images[i] = imaging.Rotate(images[i], angle, color.Transparent)
 		bPost := images[i].Bounds()
 		offset := image.Point{
@@ -682,12 +760,12 @@ func Woke(images []image.Image, alpha, hue, hueWeight, lightness, scale, random 
 			}, imaging.OpLighten)
 			flip = !flip
 		}
-		woke := imaging.OverlayWithOp(images[i], layer, image.Point{}, imaging.OpBlend(alpha))
+		woke := imaging.OverlayWithOp(images[i], layer, image.ZP, imaging.OpBlend(alpha))
 		if clip {
 			images[i] = imaging.OverlayWithOp(
 				woke,
 				images[i],
-				image.Point{},
+				image.ZP,
 				imaging.OpReplaceAlpha,
 			)
 			return
@@ -743,9 +821,9 @@ func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturati
 		images[i] = imaging.AdjustSigmoid(images[i], 0.5, contrast)
 		jpeg(i, 100-(loss/2))
 		if clip {
-			images[i] = imaging.OverlayWithOp(images[i], original, image.Point{}, imaging.OpReplaceAlpha)
+			images[i] = imaging.OverlayWithOp(images[i], original, image.ZP, imaging.OpReplaceAlpha)
 		}
-		images[i] = imaging.OverlayWithOp(images[i], exploded, image.Point{}, imaging.OpMinAlpha)
+		images[i] = imaging.OverlayWithOp(images[i], exploded, image.ZP, imaging.OpMinAlpha)
 	}
 	parallel(len(images), fry)
 }
@@ -838,6 +916,7 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 	}
 	outputBuf := &bytes.Buffer{}
 	r := bytes.NewReader(inputBuf.Bytes())
+	os.Stderr.WriteString("\n")
 	for colors := maxColors + colorsStep; colors > 0; colors -= colorsStep {
 		var colorsArg *string
 		if colors <= maxColors {
@@ -912,7 +991,7 @@ func Pad(images []image.Image) {
 	parallel(len(images), pad)
 }
 
-func Crop(images []image.Image, threshold float64, auto bool) {
+func AutoCrop(images []image.Image, threshold float64) {
 	width, height := 0, 0
 	for i := range images {
 		if w := images[i].Bounds().Dx(); w > width {
@@ -924,13 +1003,38 @@ func Crop(images []image.Image, threshold float64, auto bool) {
 	}
 	sample := imaging.Clone(images[0])
 	for i := range images {
-		sample = imaging.OverlayWithOp(sample, images[i], image.Point{}, imaging.OpMaxAlpha)
+		sample = imaging.OverlayWithOp(sample, images[i], image.ZP, imaging.OpMaxAlpha)
 	}
 	b := imaging.OpaqueBounds(sample, uint8(threshold*255))
 	crop := func(i int) {
 		images[i] = imaging.Crop(images[i], b)
 	}
 	parallel(len(images), crop)
+}
+
+func Compose(a,b []image.Image, p *image.Point) {
+	compose := func(i int) {
+		var offset image.Point
+		ai := i % len(a)
+		bi := i % len(b)
+		under := a[ai]
+		over := b[bi]
+		if p != nil {
+			offset = *p
+		} else {
+			offset.X = under.Bounds().Dx()/2 - over.Bounds().Dx()/2
+			offset.Y = under.Bounds().Dy()/2 - over.Bounds().Dy()/2
+		}
+		bg := image.NewNRGBA(under.Bounds().Union(over.Bounds().Add(offset)))
+		bg = imaging.Paste(bg, under, image.ZP)
+		images[i] = imaging.Overlay(bg, over, offset, 1.0)
+	}
+	var an, bn, z big.Int
+	an.SetInt64(int64(len(a)))
+	bn.SetInt64(int64(len(b)))
+	n := int(z.Mul(z.Div(&bn, z.GCD(nil, nil, &an, &bn)), &an).Int64())
+	images = make([]image.Image, n)
+	parallel(n, compose)
 }
 
 func newProgressBar(n int, desc string) *progressbar.ProgressBar {
