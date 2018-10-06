@@ -30,6 +30,8 @@ import (
 
 	_ "image/jpeg"
 
+	"github.com/schollz/progressbar"
+
 	cli "github.com/jawher/mow.cli"
 )
 
@@ -52,6 +54,7 @@ type metaEntry struct {
 
 var config configuration
 var version string
+var cliOptions string
 var noQuotesRegex = regexp.MustCompile("\\S")
 
 const (
@@ -93,6 +96,7 @@ var meta []gifmeta.Extension
 var encoded []byte
 
 func main() {
+	defer os.Stderr.WriteString("\n")
 	rand.Seed(time.Now().Unix())
 	app.Run(os.Args)
 	if config.NoOutput {
@@ -123,7 +127,8 @@ func main() {
 }
 
 func init() {
-	log.SetPrefix(fmt.Sprintf("%v ", os.Args[1:]))
+	cliOptions = fmt.Sprintf("%v ", os.Args[1:])
+	log.SetPrefix(cliOptions)
 	log.SetOutput(os.Stderr)
 	app = cli.App(appName, fmt.Sprintf("v%v", version))
 
@@ -167,14 +172,41 @@ func init() {
 
 	app.Command(commandWobble, "🍆( ͡° ͜ʖ ͡°)🍆", func(cmd *cli.Cmd) {
 		cmd.Spec = "[OPTIONS]"
+		const (
+			wobbleTypeSine = "sine"
+			wobbleTypeSnap = "snap"
+			wobbleTypeSmooth = "smooth"
+		)
 		var (
 			f = gifcmd.Float{Value: 1.0}
 			a = gifcmd.Float{Value: 20.0}
+			t = gifcmd.Enum{
+				Choices: []string{
+					wobbleTypeSine,
+					wobbleTypeSnap,
+				},
+				Value: wobbleTypeSine,
+			}
 		)
 		cmd.VarOpt("f frequency", &f, "")
 		cmd.VarOpt("a amplitude", &a, "")
+		cmd.VarOpt("t type", &t, "")
 		cmd.Action = func() {
-			Wobble(images, f.Value, a.Value)
+			frequency := f.Value
+			amplitude := a.Value
+			n := len(images)
+			fs := map[string]func(int)float64 {
+				wobbleTypeSine : func(i int) float64 {
+					return amplitude * math.Sin(2*math.Pi*frequency*float64(i)/float64(n))
+				},
+				wobbleTypeSnap : func(i int) float64 {
+					t := float64(i)/float64(n)
+					y := math.Sin(2*math.Pi*frequency*t)
+					y = math.Sin(y)
+					return amplitude * y
+				},
+			}
+			Wobble(images, fs[t.Value])
 		}
 	})
 
@@ -480,14 +512,20 @@ func Encode(w io.Writer, images []image.Image) error {
 		AddTransparent: true,
 		Aggregation:    quantize.Mean,
 	}
-	for _, img := range images {
-		palette := quantizer.Quantize(make([]color.Color, 0, 256), img)
-		imgQuantized := image.NewPaletted(img.Bounds(), palette)
-		draw.FloydSteinberg.Draw(imgQuantized, img.Bounds(), img, image.ZP)
-		out.Image = append(out.Image, imgQuantized)
-		out.Delay = append(out.Delay, config.DelayMilliseconds/10)
-		out.Disposal = append(out.Disposal, gif.DisposalBackground)
+	out.Image = make([]*image.Paletted, len(images))
+	out.Delay = make([]int, len(images))
+	out.Disposal = make([]byte, len(images))
+	quantize := func(i int) {
+		b := images[i].Bounds()
+		palette := quantizer.Quantize(make([]color.Color, 0, 256), images[i])
+		imgQuantized := image.NewPaletted(b, palette)
+		draw.FloydSteinberg.Draw(imgQuantized, b, images[i], image.ZP)
+		out.Image[i] = imgQuantized
+		out.Delay[i] = config.DelayMilliseconds/10
+		out.Disposal[i] = gif.DisposalBackground
 	}
+	parallel(len(images), quantize)
+
 	if !config.WriteMeta {
 		return gif.EncodeAll(w, &out)
 	}
@@ -528,10 +566,9 @@ func Roll(images []image.Image, rev float64) {
 }
 
 // Wobble `images` `frequency` times by `amplitude` degrees
-func Wobble(images []image.Image, frequency, amplitude float64) {
-	n := len(images)
+func Wobble(images []image.Image, f func(int) float64) {
 	rotate := func(i int) {
-		angle := amplitude * math.Sin(2*math.Pi*frequency*float64(i)/float64(n))
+		angle := f(i)
 		bPre := images[i].Bounds()
 		images[i] = imaging.Rotate(images[i], angle, color.Transparent)
 		bPost := images[i].Bounds()
@@ -713,18 +750,19 @@ func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturati
 	parallel(len(images), fry)
 }
 
-// Resize by
+// ResizeScale resizes by a factor
 func ResizeScale(images []image.Image, scale float64) {
-	for i := range images {
+	resize := func(i int) {
 		b := images[i].Bounds()
 		width, height := float64(b.Dx()), float64(b.Dy())
 		images[i] = imaging.Resize(images[i], int(width*scale), int(height*scale), imaging.Lanczos)
 	}
+	parallel(len(images), resize)
 }
 
-// Resize to
+// ResizeTarget resizes to fit in the given bounds
 func ResizeTarget(images []image.Image, width, height float64) {
-	for i := range images {
+	resize := func(i int) {
 		b := images[i].Bounds()
 		w, h := float64(b.Dx()), float64(b.Dy())
 		scale := 1.0
@@ -743,6 +781,7 @@ func ResizeTarget(images []image.Image, width, height float64) {
 		}
 		images[i] = imaging.Resize(images[i], int(w*scale), int(h*scale), imaging.Lanczos)
 	}
+	parallel(len(images), resize)
 }
 
 func TintPulse(images []image.Image, frequency, weight, from, to float64) {
@@ -768,9 +807,7 @@ func TintPulse(images []image.Image, frequency, weight, from, to float64) {
 		}
 		images[i] = imaging.AdjustHue(images[i], weight, hue)
 	}
-	for i := range images {
-		tint(i)
-	}
+	parallel(len(images), tint)
 }
 
 func HuePulse(images []image.Image, frequency, from, to float64) {
@@ -781,9 +818,7 @@ func HuePulse(images []image.Image, frequency, from, to float64) {
 		delta := mid + (dist * math.Sin(math.Pi+2*math.Pi*frequency*float64(i)/n) / 2)
 		images[i] = imaging.AdjustHueRotate(images[i], delta)
 	}
-	for i := range images {
-		hue(i)
-	}
+	parallel(len(images), hue)
 }
 
 func Optimize(images []image.Image, kb int64, w, h int) {
@@ -870,10 +905,11 @@ func Pad(images []image.Image) {
 			height = h
 		}
 	}
-	for i := range images {
+	pad := func(i int) {
 		padded := imaging.New(width, height, color.Transparent)
 		images[i] = imaging.PasteCenter(padded, images[i])
 	}
+	parallel(len(images), pad)
 }
 
 func Crop(images []image.Image, threshold float64, auto bool) {
@@ -891,28 +927,35 @@ func Crop(images []image.Image, threshold float64, auto bool) {
 		sample = imaging.OverlayWithOp(sample, images[i], image.Point{}, imaging.OpMaxAlpha)
 	}
 	b := imaging.OpaqueBounds(sample, uint8(threshold*255))
-	log.Println(b)
 	crop := func(i int) {
 		images[i] = imaging.Crop(images[i], b)
 	}
 	parallel(len(images), crop)
 }
 
+func newProgressBar(n int, desc string) *progressbar.ProgressBar {
+	bar := progressbar.NewOptions(n, progressbar.OptionSetWriter(os.Stderr), progressbar.OptionSetDescription(desc))
+	return bar
+}
+
 func parallel(n int, f func(int)) {
 	work := make(chan int, 4)
 	var wg sync.WaitGroup
 	wg.Add(config.Parallelism)
+	bar := newProgressBar(n, cliOptions)
+	bar.RenderBlank()
+
 	for i := 0; i < config.Parallelism; i++ {
 		go func() {
 			for i := range work {
 				f(i)
+				bar.Add(1)
 			}
 			wg.Done()
 		}()
 	}
 	for i := 0; i < n; i++ {
 		work <- i
-		log.Printf("%02d/%02d", i+1, n)
 	}
 	close(work)
 	wg.Wait()
