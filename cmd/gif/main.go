@@ -536,10 +536,10 @@ func init() {
 		)
 		cmd.VarOpt("x", &rpx, "🌀 x")
 		cmd.VarOpt("y", &rpy, "🌀 y")
-		cmd.VarOpt("s scale", &rs, "🌀 scale")
-		cmd.VarOpt("r rotate", &rr, "🌀 rotation")
-		cmd.VarOpt("a alpha", &ra, "🌀 alpha")
-		cmd.VarOpt("o offset", &ro, "🌀 frame offset")
+		cmd.VarOpt("s scale", &rs, "🌀 [0.0,1.0]")
+		cmd.VarOpt("r rotate", &rr, "🌀 [0.0,1.0]")
+		cmd.VarOpt("a alpha", &ra, "🌀 [0.0,1.0]")
+		cmd.VarOpt("o offset", &ro, "🌀 [0.0,1.0]")
 		cmd.Action = func() {
 			Crowd(images, *n, *rf, rpx.Value, rpy.Value, rs.Value, ra.Value, rr.Value, ro.Value)
 			AutoCrop(images, 0.0)
@@ -983,7 +983,14 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 	lossStep := 10
 	colorsStep := 16
 	var resizeArg *string
-	if w > 0 && h > 0 {
+	switch {
+	case w > 0 && h == 0:
+		arg := fmt.Sprintf("--resize-width=%d", w)
+		resizeArg = &arg
+	case w == 0 && h > 0:
+		arg := fmt.Sprintf("--resize-height=%d", w)
+		resizeArg = &arg
+	case w > 0 && h > 0:
 		arg := fmt.Sprintf("--resize-fit=%dx%d", w, h)
 		resizeArg = &arg
 	}
