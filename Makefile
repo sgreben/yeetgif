@@ -3,7 +3,7 @@
 APP=gif
 NAME := yeetgif
 REPOSITORY := quay.io/sergey_grebenshchikov/$(NAME)
-VERSION := 1.8.0
+VERSION := 1.8.1
 VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)")
 
 PACKAGES := $(shell go list -f {{.Dir}} ./...)
