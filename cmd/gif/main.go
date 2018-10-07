@@ -299,7 +299,7 @@ func init() {
 			b          = gifcmd.Float{Value: 0.2}
 			c          = gifcmd.Float{Value: 0.9}
 			clip       = cmd.BoolOpt("clip", true, "")
-			q          = cmd.IntOpt("j jpeg", 84, "")
+			q          = cmd.IntOpt("j jpeg", 84, "[0,100]")
 			w          = cmd.IntOpt("w walk", 10, "🌀")
 			t          = gifcmd.Float{Value: 0.4}
 			n         = gifcmd.Float{Value: 1.0}
@@ -314,9 +314,9 @@ func init() {
 		cmd.VarOpt("b", &b, "🅱️")
 		cmd.VarOpt("c", &c, "🆑")
 		cmd.VarOpt("n noise", &n, "🌀️")
-		cmd.VarOpt("n1 noise1", &n1, "🌀️")
-		cmd.VarOpt("n2 noise2", &n2, "🌀️")
-		cmd.VarOpt("n3 noise3", &n3, "🌀")
+		cmd.VarOpt("noise1", &n1, "🌀️")
+		cmd.VarOpt("noise2", &n2, "🌀️")
+		cmd.VarOpt("noise3", &n3, "🌀")
 		cmd.VarOpt("u saturation", &saturation, "")
 		cmd.VarOpt("o contrast", &contrast, "")
 		cmd.VarOpt("t tint", &t, "tint")
@@ -324,6 +324,12 @@ func init() {
 			n1.Value *= n.Value
 			n2.Value *= n.Value
 			n3.Value *= n.Value
+			if *q > 100 {
+				*q = 100
+			}
+			if *q < 0 {
+				*q = 0
+			}
 			for i := 0; i < *iterations; i++ {
 				Fried(images, t.Value, a.Value, b.Value, c.Value, *q, *w, saturation.Value, contrast.Value, n1.Value, n2.Value, n3.Value, *clip)
 			}
@@ -426,10 +432,10 @@ func init() {
 			p = gifcmd.Enum{
 				Choices: []string{
 					positionCenter,
-					// positionLeft,
-					// positionRight,
-					// positionTop,
-					// positionBottom,
+					positionLeft,
+					positionRight,
+					positionTop,
+					positionBottom,
 					positionAbsolute,
 				},
 				Value: positionCenter,
@@ -438,8 +444,8 @@ func init() {
 			y = cmd.IntOpt("y", 0, "")
 			s = gifcmd.Float{Value: 1.0}
 		)
-		cmd.VarOpt("z z-order", &z, "")
-		cmd.VarOpt("p position", &p, "")
+		cmd.VarOpt("z z-order", &z, z.Help())
+		cmd.VarOpt("p position", &p, p.Help())
 		cmd.VarOpt("s scale", &s, "")
 		cmd.Action = func() {
 			f, err := os.Open(*input)
@@ -451,18 +457,33 @@ func init() {
 			if s.Value != 1.0 {
 				ResizeScale(layer, s.Value)
 			}
-			var offset *image.Point
+			offset := image.Point{*x,*y}
+			var imageAnchor, layerAnchor imaging.Anchor
 			switch p.Value {
 			case positionAbsolute:
-				offset = &image.Point{*x,*y}
+				imageAnchor = imaging.TopLeft
+				layerAnchor = imaging.Center
 			case positionCenter:
-				offset = nil
+				imageAnchor = imaging.Center
+				layerAnchor = imaging.Center
+			case positionLeft:
+				imageAnchor = imaging.Left
+				layerAnchor = imaging.Right
+			case positionRight:
+				imageAnchor = imaging.Right
+				layerAnchor = imaging.Left
+			case positionTop:
+				imageAnchor = imaging.Top
+				layerAnchor = imaging.Bottom
+			case positionBottom:
+				imageAnchor = imaging.Bottom
+				layerAnchor = imaging.Top
 			}
 			switch z.Value {
 			case orderOver:
-				Compose(images, layer, offset)
+				Compose(images, layer, offset, imageAnchor, layerAnchor)
 			case orderUnder:
-				Compose(layer, images, offset)
+				Compose(layer, images, offset, layerAnchor, imageAnchor)
 			}
 		}
 	})
@@ -784,9 +805,6 @@ func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturati
 		loss = 100
 	}
 	jpeg := func(i, quality int) {
-		if quality == 100 {
-			return
-		}
 		buf := &bytes.Buffer{}
 		imaging.Encode(buf, images[i], imaging.JPEG, imaging.JPEGQuality(quality))
 		images[i], _, _ = image.Decode(buf)
@@ -1012,22 +1030,17 @@ func AutoCrop(images []image.Image, threshold float64) {
 	parallel(len(images), crop)
 }
 
-func Compose(a,b []image.Image, p *image.Point) {
+func Compose(a,b []image.Image, p image.Point, anchorA, anchorB imaging.Anchor) {
 	compose := func(i int) {
-		var offset image.Point
 		ai := i % len(a)
 		bi := i % len(b)
 		under := a[ai]
 		over := b[bi]
-		if p != nil {
-			offset = *p
-		} else {
-			offset.X = under.Bounds().Dx()/2 - over.Bounds().Dx()/2
-			offset.Y = under.Bounds().Dy()/2 - over.Bounds().Dy()/2
-		}
-		bg := image.NewNRGBA(under.Bounds().Union(over.Bounds().Add(offset)))
-		bg = imaging.Paste(bg, under, image.ZP)
-		images[i] = imaging.Overlay(bg, over, offset, 1.0)
+		overOffset := imaging.AnchorPoint(under, anchorA).Sub(imaging.AnchorPoint(over, anchorB))
+		bounds := under.Bounds().Union(over.Bounds().Add(overOffset))
+		bg := image.NewNRGBA(bounds.Sub(bounds.Min))
+		bg = imaging.Paste(bg, under, bounds.Min.Mul(-1))
+		images[i] = imaging.Overlay(bg, over, overOffset.Sub(bounds.Min), 1.0)
 	}
 	var an, bn, z big.Int
 	an.SetInt64(int64(len(a)))
