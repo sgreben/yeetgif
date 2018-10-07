@@ -77,6 +77,7 @@ const (
 	commandCompose  = "compose"
 	commandCrowd    = "crowd"
 	commandMeta     = "meta"
+	commandErase    = "erase"
 	commandNop      = "nop"
 )
 
@@ -173,11 +174,13 @@ func init() {
 		var (
 			r = gifcmd.Float{Value: 1.0}
 			s = gifcmd.Float{Value: 1.0}
+			p = gifcmd.Float{Value: 0.0}
 		)
 		cmd.VarOpt("r revolutions", &r, "")
 		cmd.VarOpt("s scale", &s, "")
+		cmd.VarOpt("p phase", &p, "")
 		cmd.Action = func() {
-			Roll(images, r.Value, s.Value)
+			Roll(images, r.Value, s.Value, p.Value)
 		}
 	})
 
@@ -283,14 +286,15 @@ func init() {
 			typeCenter = "center"
 		)
 		var (
-			random = gifcmd.Float{Value: 0.5}
-			s      = gifcmd.Float{Value: 0.9}
-			h      = gifcmd.Float{Value: 0.8}
-			l      = gifcmd.Float{Value: 1.0}
-			a      = gifcmd.Float{Value: 0.8}
-			ap     = gifcmd.Float{Value: 2.0}
-			clip   = cmd.BoolOpt("c clip", true, "clip flares to image alpha")
-			t      = gifcmd.Enum{
+			random    = gifcmd.Float{Value: 0.5}
+			s         = gifcmd.Float{Value: 0.9}
+			hue       = gifcmd.Float{Value: 0.8}
+			lightness = gifcmd.Float{Value: 1.0}
+			alpha     = gifcmd.Float{Value: 0.8}
+			ap        = gifcmd.Float{Value: 2.0}
+			at        = gifcmd.Float{Value: 0.15}
+			clip      = cmd.BoolOpt("c clip", true, "clip flares to image alpha")
+			t         = gifcmd.Enum{
 				Choices: []string{typeFull, typeCenter},
 				Value:   typeFull,
 			}
@@ -299,10 +303,11 @@ func init() {
 		)
 		cmd.VarOpt("t type", &t, "")
 		cmd.VarOpt("s scale", &s, "")
-		cmd.VarOpt("u hue", &h, "")
-		cmd.VarOpt("l lightness", &l, "")
-		cmd.VarOpt("a alpha", &a, "")
+		cmd.VarOpt("u hue", &hue, "")
+		cmd.VarOpt("l lightness", &lightness, "")
+		cmd.VarOpt("a alpha", &alpha, "")
 		cmd.VarOpt("p alpha-pow", &ap, "")
+		cmd.VarOpt("alpha-threshold", &at, "")
 		cmd.VarOpt("r random", &random, "🌀")
 		cmd.VarArg("POINTS", &flaresVar, `flare locations, JSON, e.g. "[[123,456],[-100,23]]"`)
 		cmd.Action = func() {
@@ -310,7 +315,7 @@ func init() {
 			for _, p := range flares {
 				flarePoints = append(flarePoints, image.Point{X: p[0], Y: p[1]})
 			}
-			changeHue := h.Text != ""
+			changeHue := hue.Text != ""
 			var flare image.Image
 			switch t.Value {
 			case typeFull:
@@ -318,12 +323,27 @@ func init() {
 			case typeCenter:
 				flare = gifstatic.LensFlareCenter
 			}
-			if changeHue {
-				flare = imaging.AdjustHSLAFunc(flare, func(hue, _, _, _ *float64) {
-					*hue += h.Value
-				})
-			}
-			Woke(images, flare, ap.Value, a.Value, l.Value, s.Value, random.Value, flarePoints, *clip)
+			b := flare.Bounds()
+			width := int(float64(b.Dx()) * s.Value)
+			height := int(float64(b.Dy()) * s.Value)
+			flare = imaging.Resize(flare, width, height, imaging.Lanczos)
+			alphaT := at.Value
+			alphaP := ap.Value
+			alphaV := alpha.Value
+			flare = imaging.AdjustHSLAFunc(flare, func(h, s, l, a *float64) {
+				*a = math.Pow(*a, alphaP) * alphaV
+				if *a < alphaT {
+					*a = 0
+					return
+				} else {
+					*a = (*a - alphaT) / (1.0 - alphaT)
+				}
+				*l = (*l) * lightness.Value
+				if changeHue {
+					*h += hue.Value
+				}
+			})
+			Woke(images, flare, random.Value, flarePoints, *clip)
 		}
 	})
 
@@ -546,6 +566,25 @@ func init() {
 		}
 	})
 
+	app.Command(commandErase, "( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿", func(cmd *cli.Cmd) {
+		var (
+			t  = gifcmd.Float{Value: 0.2}
+			x  = cmd.IntOpt("x sample-x", 3, "")
+			y  = cmd.IntOpt("y sample-y", 3, "")
+			wh = gifcmd.Float{Value: 1.0}
+			ws = gifcmd.Float{Value: 0.5}
+			wl = gifcmd.Float{Value: 1.0}
+		)
+		//sample = cmd.BoolOpt("sample", true, "")
+		cmd.VarOpt("t tolerance", &t, "")
+		cmd.VarOpt("u", &wh, "")
+		cmd.VarOpt("s", &ws, "")
+		cmd.VarOpt("l", &wl, "")
+		cmd.Action = func() {
+			Erase(images, *x, *y, t.Value, wh.Value, ws.Value, wl.Value)
+		}
+	})
+
 	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) {
 		cmd.Action = func() {}
 	})
@@ -700,10 +739,10 @@ func Encode(w io.Writer, images []image.Image) error {
 }
 
 // Roll the `images` `rev` times
-func Roll(images []image.Image, rev, preScale float64) {
+func Roll(images []image.Image, rev, preScale, phase float64) {
 	n := len(images)
 	rotate := func(i int) {
-		angle := 360 * rev * float64(i) / float64(n)
+		angle := 360*rev*float64(i)/float64(n) + phase*360
 		bPre := images[i].Bounds()
 		if preScale != 1.0 {
 			images[i] = imaging.Resize(images[i], int(float64(bPre.Dx())*preScale), int(float64(bPre.Dy())*preScale), imaging.Lanczos)
@@ -813,19 +852,11 @@ func Shake(images []image.Image, random, frequency, amplitude float64) {
 }
 
 // Woke flares
-func Woke(images []image.Image, flare image.Image, alphaPow, alpha, lightness, scale, random float64, flares []image.Point, clip bool) {
-	b := flare.Bounds()
-	width := int(float64(b.Dx()) * scale)
-	height := int(float64(b.Dy()) * scale)
-	flare = imaging.Resize(flare, width, height, imaging.Lanczos)
-	flare = imaging.AdjustHSLAFunc(flare, func(h, s, l, a *float64) {
-		*a = math.Pow(*a, alphaPow) * alpha
-		*l = (*l) * lightness
-	})
+func Woke(images []image.Image, flare image.Image, random float64, flares []image.Point, clip bool) {
 	woke := func(i int) {
 		b := images[i].Bounds()
 		layer := imaging.New(b.Dx(), b.Dy(), color.Transparent)
-		flip := true
+		flip := false // (i % 2) == 0
 		for _, p := range flares {
 			flare := flare
 			if random > 0 {
@@ -839,7 +870,6 @@ func Woke(images []image.Image, flare image.Image, alphaPow, alpha, lightness, s
 				X: (p.X - b.Dx()/2),
 				Y: (p.Y - b.Dy()/2),
 			}, imaging.OpLighten)
-			flip = !flip
 		}
 		woke := imaging.Overlay(images[i], layer, image.ZP, 1.0)
 		if clip {
@@ -1169,6 +1199,26 @@ func Crowd(images []image.Image, k int, rf bool, rpx, rpy, rs, ra, rr, ro float6
 	}
 	parallel(len(images), crowd)
 	parallel(len(images), overwrite)
+}
+
+func Erase(images []image.Image, x, y int, t, wh, ws, wl float64) {
+	sqr := func(x float64) float64 { return x * x }
+	erase := func(i int) {
+		sample := images[i].At(x, y)
+		r, g, b, _ := sample.RGBA()
+		sh, ss, sl, _ := imaging.HSLA(color.RGBA{uint8(r / 0xff), uint8(g / 0xff), uint8(b / 0xff), 0})
+		images[i] = imaging.AdjustHSLAFunc(images[i], func(h, s, l, a *float64) {
+			dist := math.Sqrt((wh*sqr(*h-sh) + ws*sqr(*l-sl) + wl*sqr(*s-ss)) / (wh + ws + wl))
+			if dist < t/2 {
+				*a = 0
+				return
+			}
+			if dist < t {
+				*a = *a * ((dist - t/2) / (t / 2))
+			}
+		})
+	}
+	parallel(len(images), erase)
 }
 
 func Compose(a, b []image.Image, p image.Point, anchorA, anchorB imaging.Anchor) {
