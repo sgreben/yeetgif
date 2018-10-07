@@ -241,9 +241,8 @@ func init() {
 			phase := ph.Value
 			left := from.Value
 			right := to.Value
-			n := len(images)
-			Pulse(images, func(i int) float64 {
-				weight := math.Sin(2*math.Pi*phase + 2*math.Pi*frequency*float64(i)/float64(n))
+			Pulse(images, func(t float64) float64 {
+				weight := math.Sin(2*math.Pi*phase + 2*math.Pi*frequency*t)
 				return left*weight + right*(1-weight)
 			})
 		}
@@ -744,9 +743,10 @@ func Wobble(images []image.Image, f func(int) float64) {
 }
 
 // Pulse `images` `frequency` times between scales `from` and `to`
-func Pulse(images []image.Image, f func(int) float64) {
+func Pulse(images []image.Image, f func(float64) float64) {
+	n := float64(len(images))
 	scale := func(i int) {
-		scale := f(i)
+		scale := f(float64(i) / n)
 		bPre := images[i].Bounds()
 		width := float64(bPre.Dx()) * scale
 		height := float64(bPre.Dy()) * scale
@@ -1095,32 +1095,38 @@ func Crowd(images []image.Image, k int, rpx, rpy, rs, ra, rr, ro float64) {
 	s := make([]float64, k)
 	a := make([]float64, k)
 	o := make([]int, k)
-	width, height := 0, 0
+	for j := range s {
+		s[j] = 1.0 - (rand.Float64() * rs)
+		r[j] = 360 * rr * 2 * (rand.Float64() - 0.5)
+		o[j] = rand.Intn(int(ro * float64(len(images)-1)))
+		a[j] = 1.0 - (rand.Float64() * ra)
+	}
+	width, height := 0.0, 0.0
 	for i := range images {
-		if w := images[i].Bounds().Dx(); w > width {
-			width = w
-		}
-		if h := images[i].Bounds().Dy(); h > height {
-			height = h
+		for j := range r {
+			tmp := imaging.Rotate(images[i], r[j], color.Transparent)
+			b := tmp.Bounds()
+			if w := float64(b.Dx()) * s[j]; w > width {
+				width = w
+			}
+			if h := float64(b.Dy()) * s[j]; h > height {
+				height = h
+			}
 		}
 	}
 	mid := image.Point{
-		X: width / 2,
-		Y: height / 2,
+		X: int(width / 2),
+		Y: int(height / 2),
 	}
 	var b, bOriginal image.Rectangle
-	bOriginal.Max.X = width
-	bOriginal.Max.Y = height
+	bOriginal.Max.X = int(width)
+	bOriginal.Max.Y = int(height)
 	b.Max.X = bOriginal.Max.X
 	b.Max.Y = bOriginal.Max.Y
 	for j := range p {
-		s[j] = 1.0 - (rand.Float64() * rs)
-		r[j] = 360 * rr * 2 * (rand.Float64() - 0.5)
 		p[j].X = int(s[j] * float64(width) * rpx * 2 * (rand.Float64() - 0.5))
 		p[j].Y = int(s[j] * float64(height) * rpy * 2 * (rand.Float64() - 0.5))
 		b = b.Union(bOriginal.Add(p[j]))
-		o[j] = rand.Intn(int(ro * float64(len(images)-1)))
-		a[j] = 1.0 - (rand.Float64() * ra)
 	}
 	offset := b.Min
 	b = b.Sub(offset)
