@@ -517,16 +517,18 @@ func init() {
 			rpx = gifcmd.Float{Value: 0.5}
 			rpy = gifcmd.Float{Value: 0.25}
 			rs  = gifcmd.Float{Value: 0.25}
+			rr  = gifcmd.Float{Value: 0.1}
 			ra  = gifcmd.Float{Value: 0.0}
 			ro  = gifcmd.Float{Value: 1.0}
 		)
 		cmd.VarOpt("x", &rpx, "random x")
 		cmd.VarOpt("y", &rpy, "random y")
 		cmd.VarOpt("s scale", &rs, "random scale")
+		cmd.VarOpt("r rotate", &rr, "random rotation")
 		cmd.VarOpt("a alpha", &ra, "random alpha")
 		cmd.VarOpt("o offset", &ro, "random frame offset")
 		cmd.Action = func() {
-			Crowd(images, *n, rpx.Value, rpy.Value, rs.Value, ra.Value, ro.Value)
+			Crowd(images, *n, rpx.Value, rpy.Value, rs.Value, ra.Value, rr.Value, ro.Value)
 			AutoCrop(images, 0.0)
 		}
 	})
@@ -1076,7 +1078,7 @@ func AutoCrop(images []image.Image, threshold float64) {
 	parallel(len(images), crop)
 }
 
-func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, ro float64) {
+func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, rr, ro float64) {
 	width, height := 0, 0
 	for i := range images {
 		if w := images[i].Bounds().Dx(); w > width {
@@ -1091,6 +1093,7 @@ func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, ro float64) {
 		Y: height / 2,
 	}
 	p := make([]image.Point, n)
+	r := make([]float64, n)
 	s := make([]float64, n)
 	a := make([]float64, n)
 	o := make([]int, n)
@@ -1101,6 +1104,7 @@ func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, ro float64) {
 	b.Max.Y = bOriginal.Max.Y
 	for j := range p {
 		s[j] = 1.0 - (rand.Float64() * rs)
+		r[j] = 360 * rr * 2 * (rand.Float64() - 0.5)
 		p[j].X = int(s[j] * float64(width) * rpx * 2 * (rand.Float64() - 0.5))
 		p[j].Y = int(s[j] * float64(height) * rpy * 2 * (rand.Float64() - 0.5))
 		b = b.Union(bOriginal.Add(p[j]))
@@ -1119,6 +1123,7 @@ func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, ro float64) {
 			bLayer := layer.Bounds()
 			w, h := float64(bLayer.Dx())*s[j], float64(bLayer.Dy())*s[j]
 			layer = imaging.Resize(layer, int(w), int(h), imaging.Lanczos)
+			layer = imaging.Rotate(layer, r[j], color.Transparent)
 			midLayer := imaging.AnchorPoint(layer, imaging.Center)
 			p := p[j].Sub(midLayer).Add(mid).Sub(offset)
 			crowded = imaging.Overlay(crowded, layer, p, a[j])
