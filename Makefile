@@ -41,13 +41,13 @@ README.md: binary examples
 examples: doc/terminal.gif doc/roll.gif doc/wobble.gif doc/pulse.gif doc/zoom.gif doc/shake.gif doc/woke.gif doc/fried.gif doc/hue.gif doc/tint.gif doc/compose.gif doc/crowd.gif
 
 doc/terminal.gif: Makefile doc/wobble.gif
-	<doc/terminal.png gif compose -s 1.0 -p right doc/wobble.gif | gif optimize -x 800 -y 0 --kb=800 > doc/terminal.gif
+	<doc/terminal.png gif -n 30 fried -j 0 -a 0 -t 0 -u 1 -o 1 -n 0.7 | gif compose -s 1.0 -p right doc/wobble.gif | gif optimize -x 800 -y 0 --kb=999 > doc/terminal.gif
 
 doc/roll.gif: Makefile
 	<doc/eggplant.png gif roll > doc/roll.gif
 
 doc/wobble.gif: Makefile
-	<doc/eggplant.png gif wobble -a 15 > doc/wobble.gif
+	<doc/eggplant.png gif -n 30 wobble -a 15 > doc/wobble.gif
 
 doc/pulse.gif: Makefile
 	<doc/eggplant.png gif pulse > doc/pulse.gif
