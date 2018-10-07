@@ -2,7 +2,7 @@
 
 Composable GIF effects CLI. Made for custom Slack/Dicord emoji :)
 
-![<doc/terminal.png | gif -n 0 resize -x 650 | gif compose -s 1.0 -p right doc/wobble.gif | gif fried -t 0 -a 0 -j 0 -n 0.2 -u 1.0 -o 1 -j 1 | gif optimize -x 0 -y 0 --kb=700 > doc/terminal.gif](doc/terminal.gif)
+![terminal](doc/terminal.gif)
 
 <!-- TOC -->
 

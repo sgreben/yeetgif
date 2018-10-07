@@ -2,7 +2,7 @@
 
 Composable GIF effects CLI. Made for custom Slack/Dicord emoji :)
 
-![<doc/terminal.png | gif -n 0 resize -x 650 | gif compose -s 1.0 -p right doc/wobble.gif | gif fried -t 0 -a 0 -j 0 -n 0.2 -u 1.0 -o 1 -j 1 | gif optimize -x 0 -y 0 --kb=700 > doc/terminal.gif](doc/terminal.gif)
+![terminal](doc/terminal.gif)
 
 <!-- TOC -->
 
@@ -70,15 +70,15 @@ brew install giflossy
 
 Usage: gif [OPTIONS] COMMAND [arg...]
 
-
-Options:
+                     
+Options:             
   -n                 Duplicate a single input image this many times (default 20)
   -q, --quiet        Disable all log output (stderr)
   -d, --delay-ms     Frame delay in milliseconds (default 20)
   -p, --pad          Pad images (default true)
       --write-meta   Write command line options into output GIF metadata (default true)
-
-Commands:
+                     
+Commands:            
   roll               (☭ ͜ʖ ☭)
   wobble             🍆( ͡° ͜ʖ ͡°)🍆
   pulse              ( ͡◉ ͜ʖ ͡◉)
@@ -95,7 +95,7 @@ Commands:
   crowd              (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
-
+                     
 Run 'gif COMMAND --help' for more information on a command.
 ```
 
@@ -108,8 +108,8 @@ Run 'gif COMMAND --help' for more information on a command.
 Usage: gif roll [OPTIONS]
 
 (☭ ͜ʖ ☭)
-
-Options:
+                      
+Options:              
   -r, --revolutions   (default 1)
   -s, --scale         (default 1)
 ```
@@ -123,8 +123,8 @@ Options:
 Usage: gif wobble [OPTIONS]
 
 🍆( ͡° ͜ʖ ͡°)🍆
-
-Options:
+                    
+Options:            
   -f, --frequency   (default 1)
   -a, --amplitude   (default 20)
   -p, --phase       (default 0)
@@ -140,8 +140,8 @@ Options:
 Usage: gif pulse [OPTIONS]
 
 ( ͡◉ ͜ʖ ͡◉)
-
-Options:
+                    
+Options:            
   -0, --from        (default 1)
   -1, --to          (default 1.5)
   -f, --frequency   (default 1)
@@ -157,8 +157,8 @@ Options:
 Usage: gif zoom [OPTIONS]
 
 (⌐▀͡ ̯ʖ▀)
-
-Options:
+               
+Options:       
   -0, --from   (default 1)
   -1, --to     (default 1.5)
 ```
@@ -172,8 +172,8 @@ Options:
 Usage: gif shake [OPTIONS]
 
 ˵(˵ ͡⚆ ͜ʖ ͡⚆˵)˵
-
-Options:
+                    
+Options:            
   -f, --frequency   (default 1)
   -a, --amplitude   (default 8)
   -r, --random      🌀 (default 0.5)
@@ -188,11 +188,11 @@ Options:
 Usage: gif woke [OPTIONS] POINTS
 
 💯  W O K E F L A R E S ( ͡ 🅱️ ͜ʖ ͡ 🅱️ ) 💯
-
-Arguments:
+                    
+Arguments:          
   POINTS            flare locations, JSON, e.g. "[[123,456],[-100,23]]" (default &[])
-
-Options:
+                    
+Options:            
   -c, --clip        clip flares to image alpha (default true)
   -t, --type        (default full)
   -s, --scale       (default 0.9)
@@ -212,8 +212,8 @@ Options:
 Usage: gif fried [OPTIONS]
 
 fr͍͈i̗̟̲̻e͕̗d̬ m̷͔͊e̶̪̿m̷̙̈́é̵̤s̷̺͒
-
-Options:
+                     
+Options:             
       --clip         (default true)
   -j, --jpeg         [0,100] (default 84)
   -w, --walk         🌀 (default 10)
@@ -239,8 +239,8 @@ Options:
 Usage: gif hue [OPTIONS]
 
 ( ͡☆ ͜ʖ ͡☆)
-
-Options:
+                    
+Options:            
   -f, --frequency   (default 1)
   -a, --amplitude   (default 0.1)
 ```
@@ -254,8 +254,8 @@ Options:
 Usage: gif tint [OPTIONS]
 
 🎨༼ຈل͜ຈ༽
-
-Options:
+                    
+Options:            
   -f, --frequency   (default 1)
   -0, --from        (default 0.7)
   -1, --to          (default 0.9)
@@ -269,8 +269,8 @@ Options:
 Usage: gif resize [OPTIONS]
 
 (° ͜ʖ°)¯\_( ͡☉ ͜ʖ ͡☉)_/¯
-
-Options:
+                 
+Options:         
   -s, --scale    (default 1)
   -x, --width    width (pixels) (default 0)
   -y, --height   height (pixels) (default 0)
@@ -283,8 +283,8 @@ Options:
 Usage: gif crop [OPTIONS]
 
 ┬┴┬┴┤ ͜ʖ ͡°)
-
-Options:
+                    
+Options:            
   -t, --threshold   (default 0)
 ```
 
@@ -295,8 +295,8 @@ Options:
 Usage: gif optimize [OPTIONS]
 
 👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
-
-Options:
+                 
+Options:         
       --kb       target file size (KB) (default 128)
   -x, --width    target width (pixels) (default 128)
   -y, --height   target height (pixels) (default 128)
@@ -311,11 +311,11 @@ Options:
 Usage: gif compose [OPTIONS] INPUT
 
 (ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧
-
-Arguments:
-  INPUT
-
-Options:
+                   
+Arguments:         
+  INPUT            
+                   
+Options:           
   -x               (default 0)
   -y               (default 0)
   -z, --z-order    one of [under over] (default over)
@@ -332,8 +332,8 @@ Options:
 Usage: gif crowd [OPTIONS]
 
 (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
-
-Options:
+                 
+Options:         
   -n             crowd size (default 3)
       --flip     🌀 flip (default true)
   -x             🌀 x (default 0.5)
@@ -360,12 +360,12 @@ Usage: gif nop
 Usage: gif meta COMMAND [arg...]
 
 (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
-
-Commands:
+               
+Commands:      
   show         show 🧠
   add          add 🧠
   clear        remove 🧠
-
+               
 Run 'gif meta COMMAND --help' for more information on a command.
 ```
 

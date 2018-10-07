@@ -47,7 +47,7 @@ doc/roll.gif: Makefile
 	<doc/eggplant.png gif roll > doc/roll.gif
 
 doc/wobble.gif: Makefile
-	<doc/eggplant.png gif -n 30 wobble -a 15 > doc/wobble.gif
+	<doc/eggplant.png gif -n 30 wobble -a 10 -f 2 > doc/wobble.gif
 
 doc/pulse.gif: Makefile
 	<doc/eggplant.png gif pulse > doc/pulse.gif
