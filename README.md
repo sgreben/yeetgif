@@ -39,14 +39,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.10.0/gif_1.10.0_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.11.0/gif_1.11.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.10.0/gif_1.10.0_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.11.0/gif_1.11.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.10.0/gif_1.10.0_windows_x86_64.zip
-unzip gif_1.10.0_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.11.0/gif_1.11.0_windows_x86_64.zip
+unzip gif_1.11.0_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -93,6 +93,7 @@ Commands:
   optimize           👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
   compose            (ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧
   crowd              (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
+  erase              ( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
@@ -112,6 +113,7 @@ Usage: gif roll [OPTIONS]
 Options:              
   -r, --revolutions   (default 1)
   -s, --scale         (default 1)
+  -p, --phase         (default 0)
 ```
 
 ### wobble
@@ -188,19 +190,20 @@ Options:
 Usage: gif woke [OPTIONS] POINTS
 
 💯  W O K E F L A R E S ( ͡ 🅱️ ͜ʖ ͡ 🅱️ ) 💯
-                    
-Arguments:          
-  POINTS            flare locations, JSON, e.g. "[[123,456],[-100,23]]" (default &[])
-                    
-Options:            
-  -c, --clip        clip flares to image alpha (default true)
-  -t, --type        (default full)
-  -s, --scale       (default 0.9)
-  -u, --hue         (default 0.8)
-  -l, --lightness   (default 1)
-  -a, --alpha       (default 0.8)
-  -p, --alpha-pow   (default 2)
-  -r, --random      🌀 (default 0.5)
+                          
+Arguments:                
+  POINTS                  flare locations, JSON, e.g. "[[123,456],[-100,23]]" (default &[])
+                          
+Options:                  
+  -c, --clip              clip flares to image alpha (default true)
+  -t, --type              (default full)
+  -s, --scale             (default 0.9)
+  -u, --hue               (default 0.8)
+  -l, --lightness         (default 1)
+  -a, --alpha             (default 0.8)
+  -p, --alpha-pow         (default 2)
+      --alpha-threshold   (default 0.15)
+  -r, --random            🌀 (default 0.5)
 ```
 
 ### fried
