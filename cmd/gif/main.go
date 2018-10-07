@@ -532,15 +532,16 @@ func init() {
 			rr  = gifcmd.Float{Value: 0.1}
 			ra  = gifcmd.Float{Value: 0.0}
 			ro  = gifcmd.Float{Value: 1.0}
+			rf  = cmd.BoolOpt("flip", true, "🌀 flip")
 		)
-		cmd.VarOpt("x", &rpx, "random x")
-		cmd.VarOpt("y", &rpy, "random y")
-		cmd.VarOpt("s scale", &rs, "random scale")
-		cmd.VarOpt("r rotate", &rr, "random rotation")
-		cmd.VarOpt("a alpha", &ra, "random alpha")
-		cmd.VarOpt("o offset", &ro, "random frame offset")
+		cmd.VarOpt("x", &rpx, "🌀 x")
+		cmd.VarOpt("y", &rpy, "🌀 y")
+		cmd.VarOpt("s scale", &rs, "🌀 scale")
+		cmd.VarOpt("r rotate", &rr, "🌀 rotation")
+		cmd.VarOpt("a alpha", &ra, "🌀 alpha")
+		cmd.VarOpt("o offset", &ro, "🌀 frame offset")
 		cmd.Action = func() {
-			Crowd(images, *n, rpx.Value, rpy.Value, rs.Value, ra.Value, rr.Value, ro.Value)
+			Crowd(images, *n, *rf, rpx.Value, rpy.Value, rs.Value, ra.Value, rr.Value, ro.Value)
 			AutoCrop(images, 0.0)
 		}
 	})
@@ -1089,22 +1090,28 @@ func AutoCrop(images []image.Image, threshold float64) {
 	parallel(len(images), crop)
 }
 
-func Crowd(images []image.Image, k int, rpx, rpy, rs, ra, rr, ro float64) {
+func Crowd(images []image.Image, k int, rf bool, rpx, rpy, rs, ra, rr, ro float64) {
 	p := make([]image.Point, k)
 	r := make([]float64, k)
 	s := make([]float64, k)
 	a := make([]float64, k)
 	o := make([]int, k)
+	f := make([]bool, k)
 	for j := range s {
 		s[j] = 1.0 - (rand.Float64() * rs)
 		r[j] = 360 * rr * 2 * (rand.Float64() - 0.5)
 		o[j] = rand.Intn(int(ro * float64(len(images)-1)))
 		a[j] = 1.0 - (rand.Float64() * ra)
+		f[j] = rf && (rand.Float32() < 0.5)
 	}
 	width, height := 0.0, 0.0
 	for i := range images {
 		for j := range r {
-			tmp := imaging.Rotate(images[i], r[j], color.Transparent)
+			tmp := images[i]
+			if f[j] {
+				tmp = imaging.FlipH(tmp)
+			}
+			tmp = imaging.Rotate(tmp, r[j], color.Transparent)
 			b := tmp.Bounds()
 			if w := float64(b.Dx()) * s[j]; w > width {
 				width = w
@@ -1139,6 +1146,9 @@ func Crowd(images []image.Image, k int, rpx, rpy, rs, ra, rr, ro float64) {
 			layer := originals[iLayer]
 			bLayer := layer.Bounds()
 			w, h := float64(bLayer.Dx())*s[j], float64(bLayer.Dy())*s[j]
+			if f[j] {
+				layer = imaging.FlipH(layer)
+			}
 			layer = imaging.Resize(layer, int(w), int(h), imaging.Lanczos)
 			layer = imaging.Rotate(layer, r[j], color.Transparent)
 			midLayer := imaging.AnchorPoint(layer, imaging.Center)
