@@ -3,8 +3,8 @@
 APP=gif
 NAME := yeetgif
 REPOSITORY := quay.io/sergey_grebenshchikov/$(NAME)
-VERSION := 1.9.0
-VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)")
+VERSION := 1.9.1
+VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)" | cut -c 1-8)
 
 PACKAGES := $(shell go list -f {{.Dir}} ./...)
 GOFILES  := $(addsuffix /*.go,$(PACKAGES))
@@ -49,47 +49,47 @@ release/$(APP)_$(VERSION)_osx_x86_64.tar.gz: binaries/osx_x86_64/$(APP)
 	mkdir -p release
 	tar cfz release/$(APP)_$(VERSION)_osx_x86_64.tar.gz -C binaries/osx_x86_64 $(APP)
 
-binaries/osx_x86_64/$(APP): $(GOFILES)
+binaries/osx_x86_64/$(APP): $(GOFILES) Makefile
 	GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/osx_x86_64/$(APP) ./cmd/$(APP)
 
 release/$(APP)_$(VERSION)_windows_x86_64.zip: binaries/windows_x86_64/$(APP).exe
 	mkdir -p release
 	cd ./binaries/windows_x86_64 && zip -r -D ../../release/$(APP)_$(VERSION)_windows_x86_64.zip $(APP).exe
 
-binaries/windows_x86_64/$(APP).exe: $(GOFILES)
+binaries/windows_x86_64/$(APP).exe: $(GOFILES) Makefile
 	GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/windows_x86_64/$(APP).exe ./cmd/$(APP)
 
 release/$(APP)_$(VERSION)_linux_x86_64.tar.gz: binaries/linux_x86_64/$(APP)
 	mkdir -p release
 	tar cfz release/$(APP)_$(VERSION)_linux_x86_64.tar.gz -C binaries/linux_x86_64 $(APP)
 
-binaries/linux_x86_64/$(APP): $(GOFILES)
+binaries/linux_x86_64/$(APP): $(GOFILES) Makefile
 	GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/linux_x86_64/$(APP) ./cmd/$(APP)
 
 release/$(APP)_$(VERSION)_osx_x86_32.tar.gz: binaries/osx_x86_32/$(APP)
 	mkdir -p release
 	tar cfz release/$(APP)_$(VERSION)_osx_x86_32.tar.gz -C binaries/osx_x86_32 $(APP)
 
-binaries/osx_x86_32/$(APP): $(GOFILES)
+binaries/osx_x86_32/$(APP): $(GOFILES) Makefile
 	GOOS=darwin GOARCH=386 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/osx_x86_32/$(APP) ./cmd/$(APP)
 
 release/$(APP)_$(VERSION)_windows_x86_32.zip: binaries/windows_x86_32/$(APP).exe
 	mkdir -p release
 	cd ./binaries/windows_x86_32 && zip -r -D ../../release/$(APP)_$(VERSION)_windows_x86_32.zip $(APP).exe
 
-binaries/windows_x86_32/$(APP).exe: $(GOFILES)
+binaries/windows_x86_32/$(APP).exe: $(GOFILES) Makefile
 	GOOS=windows GOARCH=386 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/windows_x86_32/$(APP).exe ./cmd/$(APP)
 
 release/$(APP)_$(VERSION)_linux_x86_32.tar.gz: binaries/linux_x86_32/$(APP)
 	mkdir -p release
 	tar cfz release/$(APP)_$(VERSION)_linux_x86_32.tar.gz -C binaries/linux_x86_32 $(APP)
 
-binaries/linux_x86_32/$(APP): $(GOFILES)
+binaries/linux_x86_32/$(APP): $(GOFILES) Makefile
 	GOOS=linux GOARCH=386 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/linux_x86_32/$(APP) ./cmd/$(APP)
 
 release/$(APP)_$(VERSION)_linux_arm64.tar.gz: binaries/linux_arm64/$(APP)
 	mkdir -p release
 	tar cfz release/$(APP)_$(VERSION)_linux_arm64.tar.gz -C binaries/linux_arm64 $(APP)
 
-binaries/linux_arm64/$(APP): $(GOFILES)
+binaries/linux_arm64/$(APP): $(GOFILES) Makefile
 	GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=$(VERSION_COMMIT)" -o binaries/linux_arm64/$(APP) ./cmd/$(APP)
