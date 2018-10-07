@@ -10,14 +10,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.5.0/gif_1.5.0_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.6.0/gif_1.6.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.5.0/gif_1.5.0_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.6.0/gif_1.6.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.5.0/gif_1.5.0_windows_x86_64.zip
-unzip gif_1.5.0_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.6.0/gif_1.6.0_windows_x86_64.zip
+unzip gif_1.6.0_windows_x86_64.zip
 ```
 
 ## Use it
@@ -57,7 +57,8 @@ Commands:
   crop               ┬┴┬┴┤ ͜ʖ ͡°)
   optimize           👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
   compose            (ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧
-  nop                
+  crowd              (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
+  nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
 Run 'gif COMMAND --help' for more information on a command.
