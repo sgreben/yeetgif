@@ -189,9 +189,10 @@ func init() {
 			wobbleTypeSmooth = "smooth"
 		)
 		var (
-			f = gifcmd.Float{Value: 1.0}
-			a = gifcmd.Float{Value: 20.0}
-			t = gifcmd.Enum{
+			f  = gifcmd.Float{Value: 1.0}
+			a  = gifcmd.Float{Value: 20.0}
+			ph = gifcmd.Float{Value: 0.0}
+			t  = gifcmd.Enum{
 				Choices: []string{
 					wobbleTypeSine,
 					wobbleTypeSnap,
@@ -201,18 +202,20 @@ func init() {
 		)
 		cmd.VarOpt("f frequency", &f, "")
 		cmd.VarOpt("a amplitude", &a, "")
+		cmd.VarOpt("p phase", &ph, "")
 		cmd.VarOpt("t type", &t, "")
 		cmd.Action = func() {
 			frequency := f.Value
 			amplitude := a.Value
+			phase := ph.Value
 			n := len(images)
 			fs := map[string]func(int) float64{
 				wobbleTypeSine: func(i int) float64 {
-					return amplitude * math.Sin(2*math.Pi*frequency*float64(i)/float64(n))
+					return amplitude * math.Sin(2*math.Pi*phase+2*math.Pi*frequency*float64(i)/float64(n))
 				},
 				wobbleTypeSnap: func(i int) float64 {
 					t := float64(i) / float64(n)
-					y := math.Sin(2 * math.Pi * frequency * t)
+					y := math.Sin(2*math.Pi*phase + 2*math.Pi*frequency*t)
 					y = math.Sin(y)
 					return amplitude * y
 				},
@@ -226,13 +229,23 @@ func init() {
 		var (
 			from = gifcmd.Float{Value: 1.0}
 			f    = gifcmd.Float{Value: 1.0}
+			ph   = gifcmd.Float{Value: 0.0}
 			to   = gifcmd.Float{Value: 1.5}
 		)
 		cmd.VarOpt("0 from", &from, "")
 		cmd.VarOpt("1 to", &to, "")
 		cmd.VarOpt("f frequency", &f, "")
+		cmd.VarOpt("p phase", &ph, "")
 		cmd.Action = func() {
-			Pulse(images, f.Value, from.Value, to.Value)
+			frequency := f.Value
+			phase := ph.Value
+			left := from.Value
+			right := to.Value
+			n := len(images)
+			Pulse(images, func(i int) float64 {
+				weight := math.Sin(2*math.Pi*phase + 2*math.Pi*frequency*float64(i)/float64(n))
+				return left*weight + right*(1-weight)
+			})
 		}
 	})
 
@@ -731,11 +744,9 @@ func Wobble(images []image.Image, f func(int) float64) {
 }
 
 // Pulse `images` `frequency` times between scales `from` and `to`
-func Pulse(images []image.Image, frequency, from, to float64) {
-	n := len(images)
+func Pulse(images []image.Image, f func(int) float64) {
 	scale := func(i int) {
-		weight := math.Sin(2 * math.Pi * frequency * float64(i) / float64(n))
-		scale := from*weight + to*(1-weight)
+		scale := f(i)
 		bPre := images[i].Bounds()
 		width := float64(bPre.Dx()) * scale
 		height := float64(bPre.Dy()) * scale
@@ -1078,7 +1089,12 @@ func AutoCrop(images []image.Image, threshold float64) {
 	parallel(len(images), crop)
 }
 
-func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, rr, ro float64) {
+func Crowd(images []image.Image, k int, rpx, rpy, rs, ra, rr, ro float64) {
+	p := make([]image.Point, k)
+	r := make([]float64, k)
+	s := make([]float64, k)
+	a := make([]float64, k)
+	o := make([]int, k)
 	width, height := 0, 0
 	for i := range images {
 		if w := images[i].Bounds().Dx(); w > width {
@@ -1092,11 +1108,6 @@ func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, rr, ro float64) {
 		X: width / 2,
 		Y: height / 2,
 	}
-	p := make([]image.Point, n)
-	r := make([]float64, n)
-	s := make([]float64, n)
-	a := make([]float64, n)
-	o := make([]int, n)
 	var b, bOriginal image.Rectangle
 	bOriginal.Max.X = width
 	bOriginal.Max.Y = height
