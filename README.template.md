@@ -1,6 +1,6 @@
 # yeetgif
 
-Composable GIF effects CLI. Made for custom Slack/Dicord emoji :)
+Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Discord emoji :)
 
 ![terminal](doc/terminal.gif)
 
