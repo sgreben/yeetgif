@@ -1,6 +1,6 @@
 # yeetgif
 
-![<doc/terminal.png gif -n 0 resize -x 500 | gif compose -s 0.8 -p right doc/wobble.gif | gif fried -t 0 -a 0 -j 0 -n 0.2 -u 1.0 -o 1 -j 1 | gif optimize -x 0 -y 0 --kb=500 > doc/terminal.gif](doc/terminal.gif)
+![<doc/terminal.png | gif -n 0 resize -x 650 | gif compose -s 1.0 -p right doc/wobble.gif | gif fried -t 0 -a 0 -j 0 -n 0.2 -u 1.0 -o 1 -j 1 | gif optimize -x 0 -y 0 --kb=700 > doc/terminal.gif](doc/terminal.gif)
 
 <!-- TOC -->
 
