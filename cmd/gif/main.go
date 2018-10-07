@@ -1143,7 +1143,7 @@ func Compose(a, b []image.Image, p image.Point, anchorA, anchorB imaging.Anchor)
 		bi := i % len(b)
 		under := a[ai]
 		over := b[bi]
-		overOffset := imaging.AnchorPoint(under, anchorA).Sub(imaging.AnchorPoint(over, anchorB))
+		overOffset := imaging.AnchorPoint(under, anchorA).Sub(imaging.AnchorPoint(over, anchorB)).Add(p)
 		bounds := under.Bounds().Union(over.Bounds().Add(overOffset))
 		bg := image.NewNRGBA(bounds.Sub(bounds.Min))
 		bg = imaging.Paste(bg, under, bounds.Min.Mul(-1))
