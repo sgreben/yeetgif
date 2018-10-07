@@ -23,6 +23,7 @@ Composable GIF effects CLI. Made for custom Slack/Dicord emoji :)
     - [optimize](#optimize)
     - [compose](#compose)
     - [crowd](#crowd)
+    - [erase](#erase)
     - [nop](#nop)
     - [meta](#meta)
 - [Licensing](#licensing)
@@ -345,6 +346,25 @@ Options:
   -r, --rotate   🌀 [0.0,1.0] (default 0.1)
   -a, --alpha    🌀 [0.0,1.0] (default 0)
   -o, --offset   🌀 [0.0,1.0] (default 1)
+```
+
+### erase
+
+![before](doc/skeledance.gif)![after](doc/erase.gif)
+
+```text
+
+Usage: gif erase [OPTIONS]
+
+( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿
+                    
+Options:            
+  -x, --sample-x    (default 3)
+  -y, --sample-y    (default 3)
+  -t, --tolerance   (default 0.2)
+  -u                (default 1)
+  -s                (default 0.5)
+  -l                (default 1)
 ```
 
 ### nop
