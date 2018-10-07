@@ -75,6 +75,7 @@ const (
 	commandOptimize = "optimize"
 	commandCrop     = "crop"
 	commandCompose  = "compose"
+	commandCrowd    = "crowd"
 	commandMeta     = "meta"
 	commandNop      = "nop"
 )
@@ -297,10 +298,7 @@ func init() {
 			for _, p := range flares {
 				flarePoints = append(flarePoints, image.Point{X: p[0], Y: p[1]})
 			}
-			hueWeight := 0.0
-			if h.Text != "" {
-				hueWeight = 1.0
-			}
+			changeHue := h.Text != ""
 			var flare image.Image
 			switch t.Value {
 			case typeFull:
@@ -308,7 +306,12 @@ func init() {
 			case typeCenter:
 				flare = gifstatic.LensFlareCenter
 			}
-			Woke(images, flare, ap.Value, a.Value, h.Value, hueWeight, l.Value, s.Value, random.Value, flarePoints, *clip)
+			if changeHue {
+				flare = imaging.AdjustHSLAFunc(flare, func(hue, _, _, _ *float64) {
+					*hue += h.Value
+				})
+			}
+			Woke(images, flare, ap.Value, a.Value, l.Value, s.Value, random.Value, flarePoints, *clip)
 		}
 	})
 
@@ -508,7 +511,28 @@ func init() {
 		}
 	})
 
-	app.Command(commandNop, "", func(cmd *cli.Cmd) {
+	app.Command(commandCrowd, "(⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)", func(cmd *cli.Cmd) {
+		var (
+			n   = cmd.IntOpt("n", 3, "crowd size")
+			rpx = gifcmd.Float{Value: 0.5}
+			rpy = gifcmd.Float{Value: 0.25}
+			rs  = gifcmd.Float{Value: 0.25}
+			ra  = gifcmd.Float{Value: 0.0}
+			ro  = gifcmd.Float{Value: 1.0}
+		)
+		cmd.VarOpt("x", &rpx, "random x")
+		cmd.VarOpt("y", &rpy, "random y")
+		cmd.VarOpt("s scale", &rs, "random scale")
+		cmd.VarOpt("a alpha", &ra, "random alpha")
+		cmd.VarOpt("o offset", &ro, "random frame offset")
+		cmd.Action = func() {
+			Crowd(images, *n, rpx.Value, rpy.Value, rs.Value, ra.Value, ro.Value)
+			AutoCrop(images, 0.0)
+		}
+	})
+
+	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) {
+		cmd.Action = func() {}
 	})
 
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", func(cmd *cli.Cmd) {
@@ -775,7 +799,7 @@ func Shake(images []image.Image, random, frequency, amplitude float64) {
 }
 
 // Woke flares
-func Woke(images []image.Image, flare image.Image, alphaPow, alpha, hue, hueWeight, lightness, scale, random float64, flares []image.Point, clip bool) {
+func Woke(images []image.Image, flare image.Image, alphaPow, alpha, lightness, scale, random float64, flares []image.Point, clip bool) {
 	b := flare.Bounds()
 	width := int(float64(b.Dx()) * scale)
 	height := int(float64(b.Dy()) * scale)
@@ -783,16 +807,6 @@ func Woke(images []image.Image, flare image.Image, alphaPow, alpha, hue, hueWeig
 	flare = imaging.AdjustHSLAFunc(flare, func(h, s, l, a *float64) {
 		*a = math.Pow(*a, alphaPow) * alpha
 		*l = (*l) * lightness
-		if hueWeight == 0 {
-			return
-		}
-		hueDistDirect := math.Abs(*h - hue)
-		hueDistWrap := math.Abs(*h - 1 - hue)
-		if hueDistDirect < hueDistWrap {
-			*h = (*h)*(1-hueWeight) + hue*hueWeight
-		} else {
-			*h = ((*h)*(1-hueWeight) + (1-hue)*hueWeight)
-		}
 	})
 	woke := func(i int) {
 		b := images[i].Bounds()
@@ -1060,6 +1074,62 @@ func AutoCrop(images []image.Image, threshold float64) {
 		images[i] = imaging.Crop(images[i], b)
 	}
 	parallel(len(images), crop)
+}
+
+func Crowd(images []image.Image, n int, rpx, rpy, rs, ra, ro float64) {
+	width, height := 0, 0
+	for i := range images {
+		if w := images[i].Bounds().Dx(); w > width {
+			width = w
+		}
+		if h := images[i].Bounds().Dy(); h > height {
+			height = h
+		}
+	}
+	mid := image.Point{
+		X: width / 2,
+		Y: height / 2,
+	}
+	p := make([]image.Point, n)
+	s := make([]float64, n)
+	a := make([]float64, n)
+	o := make([]int, n)
+	var b, bOriginal image.Rectangle
+	bOriginal.Max.X = width
+	bOriginal.Max.Y = height
+	b.Max.X = bOriginal.Max.X
+	b.Max.Y = bOriginal.Max.Y
+	for j := range p {
+		s[j] = 1.0 - (rand.Float64() * rs)
+		p[j].X = int(s[j] * float64(width) * rpx * 2 * (rand.Float64() - 0.5))
+		p[j].Y = int(s[j] * float64(height) * rpy * 2 * (rand.Float64() - 0.5))
+		b = b.Union(bOriginal.Add(p[j]))
+		o[j] = rand.Intn(int(ro * float64(len(images)-1)))
+		a[j] = 1.0 - (rand.Float64() * ra)
+	}
+	offset := b.Min
+	b = b.Sub(offset)
+	originals := images
+	images = make([]image.Image, len(originals))
+	crowd := func(i int) {
+		crowded := imaging.New(b.Dx(), b.Dy(), color.Transparent)
+		for j := range p {
+			iLayer := (o[j] + i) % len(images)
+			layer := originals[iLayer]
+			bLayer := layer.Bounds()
+			w, h := float64(bLayer.Dx())*s[j], float64(bLayer.Dy())*s[j]
+			layer = imaging.Resize(layer, int(w), int(h), imaging.Lanczos)
+			midLayer := imaging.AnchorPoint(layer, imaging.Center)
+			p := p[j].Sub(midLayer).Add(mid).Sub(offset)
+			crowded = imaging.Overlay(crowded, layer, p, a[j])
+		}
+		images[i] = crowded
+	}
+	overwrite := func(i int) {
+		originals[i] = images[i]
+	}
+	parallel(len(images), crowd)
+	parallel(len(images), overwrite)
 }
 
 func Compose(a, b []image.Image, p image.Point, anchorA, anchorB imaging.Anchor) {
