@@ -250,6 +250,29 @@ func AdjustHSL(img image.Image, weight float64, h, s, l float64) *image.NRGBA {
 	return dst
 }
 
+func AdjustHSLAFunc(img image.Image, f func(h, s, l, a *float64)) *image.NRGBA {
+	src := newScanner(img)
+	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
+	parallel(0, src.h, func(ys <-chan int) {
+		for y := range ys {
+			i := y * dst.Stride
+			src.scan(0, y, src.w, y+1, dst.Pix[i:i+src.w*4])
+			for x := 0; x < src.w; x++ {
+				r, g, b, a0 := dst.Pix[i+0], dst.Pix[i+1], dst.Pix[i+2], dst.Pix[i+3]
+				h, s, l, a := HSLA(color.RGBA{R: r, G: g, B: b, A: a0})
+				f(&h, &s, &l, &a)
+				c := RGBA(h, s, l, a)
+				dst.Pix[i+0] = c.R
+				dst.Pix[i+1] = c.G
+				dst.Pix[i+2] = c.B
+				dst.Pix[i+3] = c.A
+				i += 4
+			}
+		}
+	})
+	return dst
+}
+
 func AdjustHueRotate(img image.Image, delta float64) *image.NRGBA {
 	src := newScanner(img)
 	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
