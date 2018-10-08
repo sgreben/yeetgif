@@ -74,8 +74,16 @@ var (
 
 func main() {
 	app.Before = func() {
-		ProcessGlobalFlags()
 		images = Input(os.Stdin)
+		config.Duplicate = *duplicate
+		config.Quiet = *quiet
+		config.Pad = *pad
+		config.DelayMilliseconds = *delay
+		config.WriteMeta = *writeMeta
+		if config.Quiet {
+			log.SetOutput(ioutil.Discard)
+		}
+		CommandDuplicate(config.Duplicate)
 	}
 	app.Run(os.Args)
 	if !config.NoOutput {
@@ -106,18 +114,6 @@ func init() {
 	app.Command(commandErase, "( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿", CommandErase)
 	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) { cmd.Action = func() {} })
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", CommandMeta)
-}
-
-func ProcessGlobalFlags() {
-	config.Duplicate = *duplicate
-	config.Quiet = *quiet
-	config.Pad = *pad
-	config.DelayMilliseconds = *delay
-	config.WriteMeta = *writeMeta
-	if config.Quiet {
-		log.SetOutput(ioutil.Discard)
-	}
-	CommandDuplicate(config.Duplicate)
 }
 
 func Input(r io.Reader) []image.Image {
