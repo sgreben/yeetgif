@@ -181,7 +181,7 @@ func sigmoidInv(a, b, y float64) float64 {
 	return -((math.Log((1/y)-1) / b) - a)
 }
 
-func Explode(img image.Image, position image.Point, a, b, c float64) *image.NRGBA {
+func Ripples(img image.Image, position image.Point, a, b, c float64) *image.NRGBA {
 	src := toNRGBA(img)
 	srcW := src.Bounds().Max.X
 	srcH := src.Bounds().Max.Y

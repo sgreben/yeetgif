@@ -920,7 +920,7 @@ func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturati
 	fry := func(i int) {
 		explodePoint := explodePoints[i]
 		original := images[i]
-		images[i] = imaging.Explode(images[i], explodePoint, a, b, c)
+		images[i] = imaging.Ripples(images[i], explodePoint, a, b, c)
 		exploded := images[i]
 		images[i] = imaging.AdjustTint(images[i], tint, orange)
 		images[i] = imaging.AdjustNoiseHSL(images[i], noise1, noise2, noise3)
