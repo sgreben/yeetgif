@@ -1,14 +1,18 @@
 package main
 
-import "sync"
+import (
+	"os"
+	"github.com/schollz/progressbar"
+	"sync"
+)
 
 func parallel(n int, f func(int)) {
 	work := make(chan int, 4)
 	var wg sync.WaitGroup
-	wg.Add(config.Parallelism)
-	bar := newProgressBar(n, cliOptions)
+	bar := progressbar.NewOptions(n, progressbar.OptionSetWriter(os.Stderr), progressbar.OptionSetDescription(config.CliOptions))
 	bar.RenderBlank()
 
+	wg.Add(config.Parallelism)
 	for i := 0; i < config.Parallelism; i++ {
 		go func() {
 			for i := range work {
