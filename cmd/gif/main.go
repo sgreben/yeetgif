@@ -53,6 +53,7 @@ const (
 	commandCrop     = "crop"
 	commandCompose  = "compose"
 	commandCrowd    = "crowd"
+	commandChop     = "chop"
 	commandMeta     = "meta"
 	commandErase    = "erase"
 	commandNop      = "nop"
@@ -112,6 +113,7 @@ func init() {
 	app.Command(commandCompose, "(ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧", CommandCompose)
 	app.Command(commandCrowd, "(⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)", CommandCrowd)
 	app.Command(commandErase, "( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿", CommandErase)
+	app.Command(commandChop, "✂️( ͡°Ĺ̯ ͡° )🔪", CommandChop)
 	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) { cmd.Action = func() {} })
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", CommandMeta)
 }

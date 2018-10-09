@@ -3,6 +3,7 @@ package gifcmd
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // Float is a `flag.Value` for a float argument.
@@ -25,4 +26,45 @@ func (fv *Float) Set(v string) error {
 
 func (fv *Float) String() string {
 	return fmt.Sprint(fv.Value)
+}
+
+// FloatsCSV is a `flag.Value` for comma-separated `float` arguments.
+// If `Accumulate` is set, the values of all instances of the flag are accumulated.
+// The `BitSize` fields are used for parsing when set.
+// The `Separator` field is used instead of the comma when set.
+type FloatsCSV struct {
+	Accumulate bool
+
+	Values []float64
+	Texts  []string
+}
+
+// Help returns a string suitable for inclusion in a flag help message.
+func (fv *FloatsCSV) Help() string {
+	return fmt.Sprintf("comma-separated list of 64-bit floats")
+}
+
+// Set is flag.Value.Set
+func (fv *FloatsCSV) Set(v string) error {
+	bitSize := 64
+	separator := ","
+	if !fv.Accumulate {
+		fv.Values = fv.Values[:0]
+		fv.Texts = fv.Texts[:0]
+	}
+	parts := strings.Split(v, separator)
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		n, err := strconv.ParseFloat(part, bitSize)
+		if err != nil {
+			return err
+		}
+		fv.Values = append(fv.Values, n)
+		fv.Texts = append(fv.Texts, part)
+	}
+	return nil
+}
+
+func (fv *FloatsCSV) String() string {
+	return fmt.Sprint(fv.Values)
 }
