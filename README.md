@@ -40,14 +40,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.11.3/gif_1.11.3_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.12.0/gif_1.12.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.11.3/gif_1.11.3_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.12.0/gif_1.12.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.11.3/gif_1.11.3_windows_x86_64.zip
-unzip gif_1.11.3_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.12.0/gif_1.12.0_windows_x86_64.zip
+unzip gif_1.12.0_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -95,6 +95,7 @@ Commands:
   compose            (ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧
   crowd              (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
   erase              ( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿
+  chop               ✂️( ͡°Ĺ̯ ͡° )🔪
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
@@ -131,7 +132,8 @@ Options:
   -f, --frequency   (default 1)
   -a, --amplitude   (default 20)
   -p, --phase       (default 0)
-  -t, --type        (default sine)
+  -t, --type        one of [sine snap saw sticky] (default sine)
+      --custom      comma-separated angles (°), e.g. 0,10,0,60,0 (default [])
 ```
 
 ### pulse
