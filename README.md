@@ -24,6 +24,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [compose](#compose)
     - [crowd](#crowd)
     - [erase](#erase)
+    - [chop](#chop)
     - [nop](#nop)
     - [meta](#meta)
 - [Licensing](#licensing)
@@ -367,6 +368,24 @@ Options:
   -u                (default 1)
   -s                (default 0.5)
   -l                (default 1)
+```
+
+### chop
+
+```text
+
+Usage: gif chop COMMAND [arg...]
+
+✂️( ͡°Ĺ̯ ͡° )🔪
+               
+Commands:      
+  shuffle      
+  drop-every   
+  drop-first   
+  drop-last    
+  reverse      
+               
+Run 'gif chop COMMAND --help' for more information on a command.
 ```
 
 ### nop

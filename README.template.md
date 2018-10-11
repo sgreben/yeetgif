@@ -24,6 +24,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [compose](#compose)
     - [crowd](#crowd)
     - [erase](#erase)
+    - [chop](#chop)
     - [nop](#nop)
     - [meta](#meta)
 - [Licensing](#licensing)
@@ -183,6 +184,12 @@ ${USAGE_crowd}
 
 ```text
 ${USAGE_erase}
+```
+
+### chop
+
+```text
+${USAGE_chop}
 ```
 
 ### nop
