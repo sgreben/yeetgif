@@ -34,9 +34,9 @@ func Erase(images []image.Image, x, y int, t, wh, ws, wl float64) {
 	erase := func(i int) {
 		sample := images[i].At(x, y)
 		r, g, b, _ := sample.RGBA()
-		sh, ss, sl, _ := imaging.HSLA(color.RGBA{uint8(r / 0xff), uint8(g / 0xff), uint8(b / 0xff), 0})
+		sh, ss, sl, _ := imaging.HSLA(color.RGBA{uint8(r), uint8(g), uint8(b), 0})
 		images[i] = imaging.AdjustHSLAFunc(images[i], func(h, s, l, a *float64) {
-			dist := math.Sqrt((wh*sqr(*h-sh) + ws*sqr(*l-sl) + wl*sqr(*s-ss)) / (wh + ws + wl))
+			dist := math.Sqrt((wh*sqr(*h-sh) + ws*sqr(*s-ss) + wl*sqr(*l-sl)) / (wh + ws + wl))
 			if dist < t/2 {
 				*a = 0
 				return
