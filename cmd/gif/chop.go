@@ -15,6 +15,26 @@ func CommandChop(cmd *cli.Cmd) {
 			})
 		}
 	})
+	cmd.Command("duplicate", "", func(cmd *cli.Cmd) {
+		i := cmd.IntArg("ITH", 0, "")
+		n := cmd.IntOpt("n times", 2, "how often to duplicate the frame")
+		cmd.Action = func() {
+			if *i >= len(images) {
+				*i = len(images) - 1
+			}
+			if *i < 0 {
+				*i = 0
+			}
+			frame := images[*i]
+			dups := make([]image.Image, 0, *n)
+			for j := 0; j < *n; j++ {
+				dups = append(dups, frame)
+			}
+			tail := images[*i+1:]
+			images = append(images[:*i], dups...)
+			images = append(images, tail...)
+		}
+	})
 	cmd.Command("drop-every", "", func(cmd *cli.Cmd) {
 		n := cmd.IntArg("NTH", 2, "")
 		cmd.Action = func() {
