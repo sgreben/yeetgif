@@ -41,14 +41,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.12.1/gif_1.12.1_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.13.0/gif_1.13.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.12.1/gif_1.12.1_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.13.0/gif_1.13.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.12.1/gif_1.12.1_windows_x86_64.zip
-unzip gif_1.12.1_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.13.0/gif_1.13.0_windows_x86_64.zip
+unzip gif_1.13.0_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -163,10 +163,11 @@ Options:
 Usage: gif zoom [OPTIONS]
 
 (⌐▀͡ ̯ʖ▀)
-               
-Options:       
-  -0, --from   (default 1)
-  -1, --to     (default 1.5)
+                 
+Options:         
+  -0, --from     (default 1)
+  -1, --to       (default 1.5)
+  -c, --custom   (default [])
 ```
 
 ### shake
@@ -380,6 +381,7 @@ Usage: gif chop COMMAND [arg...]
                
 Commands:      
   shuffle      
+  duplicate    
   drop-every   
   drop-first   
   drop-last    
