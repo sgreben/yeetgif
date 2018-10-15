@@ -401,6 +401,17 @@ Usage: gif nop
 
 ### meta
 
+
+![input](doc/yeet.gif)
+```sh
+$ <doc/yeet.gif gif meta show
+
+[2018-10-05T13:08:57+02:00] gif fried
+[2018-10-05T13:08:58+02:00] gif wobble
+[2018-10-05T13:08:58+02:00] gif crop
+[2018-10-05T13:08:58+02:00] gif optimize -x 0
+```
+
 ```text
 
 Usage: gif meta COMMAND [arg...]
