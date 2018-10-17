@@ -42,7 +42,7 @@ func CommandWobble(cmd *cli.Cmd) {
 	cmd.VarOpt("t type", &t, t.Help())
 	cmd.VarOpt("custom", &c, "comma-separated angles (°), e.g. 0,10,0,60,0")
 	cmd.Action = func() {
-		if len(c.Texts) > 0  {
+		if len(c.Texts) > 0 {
 			t.Value = wobbleTypeCustom
 		}
 		frequency := f.Value
@@ -89,9 +89,7 @@ func CommandWobble(cmd *cli.Cmd) {
 			wobbleTypeSaw:    saw,
 			wobbleTypeSnap:   snap,
 			wobbleTypeSticky: sticky,
-			wobbleTypeCustom: func(t float64) float64 {
-				return customF.At(t)
-			},
+			wobbleTypeCustom: customF.At,
 		}
 		Wobble(images, fs[t.Value])
 	}
