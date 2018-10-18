@@ -2,8 +2,6 @@
 
 Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Discord emoji :)
 
-🙇‍‍**IF YOU MAKE A FUNNY GIF WITH THIS, PLEASE DO ME A FAVOR AND TWEET IT WITH THE [`#yeetgif`](https://twitter.com/hashtag/yeetgif) HASHTAG**🙇‍‍
-
 ![terminal](doc/terminal.gif)
 
 <!-- TOC -->
@@ -30,6 +28,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [text](#text)
     - [nop](#nop)
     - [meta](#meta)
+- [Hall of Fame](#hall-of-fame)
 - [Licensing](#licensing)
 
 <!-- /TOC -->
@@ -450,6 +449,12 @@ Commands:
                
 Run 'gif meta COMMAND --help' for more information on a command.
 ```
+
+## Hall of Fame
+
+Tweet a GIF made with yeetgif using the [`#yeetgif`](https://twitter.com/hashtag/yeetgif) hashtag. Best ones end up below :)
+
+> No entries yet
 
 ## Licensing
 
