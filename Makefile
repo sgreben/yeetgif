@@ -36,7 +36,7 @@ release: zip README.md
 README.md: binary examples
 	<README.template.md subst USAGE_text="$$($(APP) text -h 2>&1)" USAGE_chop="$$($(APP) chop -h 2>&1)" USAGE_erase="$$($(APP) erase -h 2>&1)" USAGE_roll="$$($(APP) roll -h 2>&1)" USAGE_wobble="$$($(APP) wobble -h 2>&1)" USAGE_pulse="$$($(APP) pulse -h 2>&1)" USAGE_zoom="$$($(APP) zoom -h 2>&1)" USAGE_shake="$$($(APP) shake -h 2>&1)" USAGE_woke="$$($(APP) woke -h 2>&1)" USAGE_fried="$$($(APP) fried -h 2>&1)" USAGE_hue="$$($(APP) hue -h 2>&1)" USAGE_tint="$$($(APP) tint -h 2>&1)" USAGE_resize="$$($(APP) resize -h 2>&1)" USAGE_crop="$$($(APP) crop -h 2>&1)" USAGE_optimize="$$($(APP) optimize -h 2>&1)" USAGE_compose="$$($(APP) compose -h 2>&1)" USAGE_crowd="$$($(APP) crowd -h 2>&1)" USAGE_nop="$$($(APP) nop -h 2>&1)" USAGE_meta="$$($(APP) meta -h 2>&1)" USAGE="$$($(APP) -h 2>&1)" VERSION="$(VERSION)" APP="$(APP)" >README.md
 
-examples: doc/terminal.gif doc/roll.gif doc/wobble.gif doc/pulse.gif doc/zoom.gif doc/shake.gif doc/woke.gif doc/fried.gif doc/hue.gif doc/tint.gif doc/compose.gif doc/crowd.gif doc/erase.gif
+examples: doc/terminal.gif doc/roll.gif doc/wobble.gif doc/pulse.gif doc/zoom.gif doc/shake.gif doc/woke.gif doc/fried.gif doc/hue.gif doc/tint.gif doc/compose.gif doc/crowd.gif doc/erase.gif doc/gunther.gif
 
 doc/terminal.gif: doc/wobble.gif
 	<doc/terminal.png gif -n 5 fried -j 0 -a 0 -t 0 -u 1 -o 1 -n 0.7 | gif compose -s 1.0 -p right doc/wobble.gif | gif optimize -x 0 -y 0 --kb=999 > doc/terminal.gif
@@ -76,6 +76,9 @@ doc/compose.gif:
 
 doc/crowd.gif:
 	<doc/wobble.gif gif crowd > doc/crowd.gif
+
+doc/gunther.gif:
+	<doc/gunther.jpg gif woke -t center -a 0.7 -s 1.3 "[[160,130],[245,130]]" | gif text "i showed you my skul gun answer me" | gif fried | gif zoom -0 1.1 -1 1.1 | gif optimize -x 0 -y 0 --kb=999 > doc/gunther.gif
 
 binary:
 	go install ./cmd/$(APP)
