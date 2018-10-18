@@ -4,6 +4,8 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
 
 ![terminal](doc/terminal.gif)
 
+🙇‍‍**IF YOU MAKE A FUNNY GIF WITH THIS, PLEASE DO ME A FAVOR AND TWEET IT WITH THE [`#yeetgif`](https://twitter.com/hashtag/yeetgif) HASH TAG**🙇‍‍
+
 <!-- TOC -->
 
 - [Get it](#get-it)
