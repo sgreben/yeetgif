@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"image"
 	"io"
@@ -13,10 +12,13 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/sgreben/yeetgif/pkg/gifcmd"
+
 	"github.com/sgreben/yeetgif/pkg/gifmeta"
 
-	"image/gif"
 	_ "image/jpeg"
+
+	_ "golang.org/x/image/bmp"
 
 	cli "github.com/jawher/mow.cli"
 )
@@ -25,11 +27,12 @@ type configuration struct {
 	Duplicate         int
 	Parallelism       int
 	Quiet             bool
-	DelayMilliseconds int
+	DelayMilliseconds func(float64) float64
 	Pad               bool
 	WriteMeta         bool
 	NoOutput          bool
 	CliOptions        string
+	Raw               bool
 }
 
 var config configuration
@@ -39,24 +42,30 @@ var noQuotesRegex = regexp.MustCompile(`^[^ ()\[\]/]+$`)
 const appName = "gif"
 
 const (
-	commandRoll     = "roll"
-	commandWobble   = "wobble"
-	commandPulse    = "pulse"
-	commandZoom     = "zoom"
-	commandShake    = "shake"
-	commandWoke     = "woke"
-	commandFried    = "fried"
-	commandResize   = "resize"
-	commandHue      = "hue"
-	commandTint     = "tint"
-	commandOptimize = "optimize"
-	commandCrop     = "crop"
-	commandCompose  = "compose"
-	commandCrowd    = "crowd"
+	commandCat      = "cat"
 	commandChop     = "chop"
-	commandMeta     = "meta"
+	commandCompose  = "compose"
+	commandCrop     = "crop"
+	commandCrowd    = "crowd"
+	commandEmoji    = "emoji"
 	commandErase    = "erase"
-	commandNop      = "nop"
+	commandFried    = "fried"
+	commandHue      = "hue"
+	commandMeta     = "meta"
+	commandNoise    = "noise"
+	commandNPC      = "npc"
+	commandOptimize = "optimize"
+	commandPulse    = "pulse"
+	commandRain     = "rain"
+	commandResize   = "resize"
+	commandRoll     = "roll"
+	commandScan     = "scan"
+	commandShake    = "shake"
+	commandText     = "text"
+	commandTint     = "tint"
+	commandWobble   = "wobble"
+	commandWoke     = "woke"
+	commandZoom     = "zoom"
 )
 
 var app = cli.App(appName, fmt.Sprintf("%v", version))
@@ -66,25 +75,26 @@ var encoded []byte
 
 // Global flags
 var (
-	duplicate = app.IntOpt("n", 20, "Duplicate a single input image this many times")
+	duplicate = app.IntOpt("n", 30, "Duplicate a single input image this many times")
 	quiet     = app.BoolOpt("q quiet", false, "Disable all log output (stderr)")
-	delay     = app.IntOpt("d delay-ms", 20, "Frame delay in milliseconds")
+	delay     = gifcmd.FloatsCSV{Values: []float64{25}}
 	pad       = app.BoolOpt("p pad", true, "Pad images")
 	writeMeta = app.BoolOpt("write-meta", true, "Write command line options into output GIF metadata")
+	raw       = app.BoolOpt("r raw", false, "Raw (lossless, *not* GIF) image output, for re-piping to yeetgif")
 )
 
 func main() {
+	app.VarOpt("d delay-ms", &delay, "Frame delay in milliseconds")
 	app.Before = func() {
-		images = Input(os.Stdin)
+		config.Raw = *raw
 		config.Duplicate = *duplicate
 		config.Quiet = *quiet
 		config.Pad = *pad
-		config.DelayMilliseconds = *delay
+		config.DelayMilliseconds = delay.PiecewiseLinear(0, 1)
 		config.WriteMeta = *writeMeta
 		if config.Quiet {
 			log.SetOutput(ioutil.Discard)
 		}
-		CommandDuplicate(config.Duplicate)
 	}
 	app.Run(os.Args)
 	if !config.NoOutput {
@@ -94,6 +104,7 @@ func main() {
 
 func init() {
 	rand.Seed(time.Now().Unix())
+	log.SetFlags(0)
 	log.SetOutput(os.Stderr)
 	config.CliOptions = fmt.Sprintf("%v ", os.Args[1:])
 	log.SetPrefix(config.CliOptions)
@@ -114,54 +125,14 @@ func init() {
 	app.Command(commandCrowd, "(⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)", CommandCrowd)
 	app.Command(commandErase, "( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿", CommandErase)
 	app.Command(commandChop, "✂️( ͡°Ĺ̯ ͡° )🔪", CommandChop)
-	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) { cmd.Action = func() {} })
+	app.Command(commandText, "🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️", CommandText)
+	app.Command(commandEmoji, "╰( ͡° ͜ʖ ͡° )つ──☆*🤔", CommandEmoji)
+	app.Command(commandNPC, "•L•", CommandNPC)
+	app.Command(commandRain, "。°。°( ͡° ͜ʖ ͡ °)°。°。°", CommandRain)
+	app.Command(commandScan, "( ͡ ⿳ ͜ʖ ͡ ⿳ )", CommandScan)
+	app.Command(commandNoise, "·͙*̩̩͙˚̩̥̩̥( ͡▓▒ ͜ʖ ͡█░ )*̩̩͙:͙", CommandNoise)
+	app.Command(commandCat, "/ᐠ｡ꞈ｡ᐟ\\", CommandCat)
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", CommandMeta)
-}
-
-func Input(r io.Reader) []image.Image {
-	images := Decode(os.Stdin)
-	if len(images) == 0 {
-		log.Fatal("no images read")
-	}
-	return images
-}
-
-// Decode images from `r`
-func Decode(r io.Reader) []image.Image {
-	var images []image.Image
-	input := &bytes.Buffer{}
-	_, err := io.Copy(input, r)
-	if err != nil {
-		log.Fatalf("read: %v", err)
-	}
-	seekableReader := bytes.NewReader(input.Bytes())
-	peekBuf := &bytes.Buffer{}
-	tee := io.TeeReader(seekableReader, peekBuf)
-	for seekableReader.Len() > 0 {
-		peekBuf.Reset()
-		gif, err := gif.DecodeAll(tee)
-		n := int64(peekBuf.Len())
-		if err == nil {
-			for _, img := range gif.Image {
-				images = append(images, img)
-			}
-			moreMeta, err := gifmeta.Read(peekBuf, func(e *gifmeta.Extension) bool {
-				return e.Type == gifmeta.Comment
-			})
-			meta = append(meta, moreMeta...)
-			if err != nil {
-				log.Printf("read gif meta: %v", err)
-			}
-			continue
-		}
-		seekableReader.Seek(-n, io.SeekCurrent)
-		img, _, err := image.Decode(seekableReader)
-		if err != nil {
-			continue
-		}
-		images = append(images, img)
-	}
-	return images
 }
 
 func Output(w io.WriteCloser, images []image.Image, encoded []byte) {
@@ -172,12 +143,23 @@ func Output(w io.WriteCloser, images []image.Image, encoded []byte) {
 		}
 		err = w.Close()
 		if err != nil {
-			log.Fatalf("close stdout: %v", err)
+			log.Fatalf("close output: %v", err)
 		}
 		return
 	}
 	if config.Pad {
 		Pad(images)
+	}
+	if config.Raw {
+		err := EncodeRaw(w, images)
+		if err != nil {
+			log.Fatalf("encode (raw): %v", err)
+		}
+		err = w.Close()
+		if err != nil {
+			log.Fatalf("close output: %v", err)
+		}
+		return
 	}
 	err := Encode(w, images)
 	if err != nil {
@@ -185,7 +167,7 @@ func Output(w io.WriteCloser, images []image.Image, encoded []byte) {
 	}
 	err = w.Close()
 	if err != nil {
-		log.Fatalf("close stdout: %v", err)
+		log.Fatalf("close output: %v", err)
 	}
 	os.Stderr.WriteString("\n")
 }

@@ -637,7 +637,7 @@ func (f *Font) initialize(offset int, isDfont bool) error {
 	if err != nil {
 		return err
 	}
-	buf, xHeight, capHeight, err := f.parseOS2(buf)
+	buf, os2Vers, xHeight, capHeight, err := f.parseOS2(buf)
 	if err != nil {
 		return err
 	}
@@ -663,6 +663,15 @@ func (f *Font) initialize(offset int, isDfont bool) error {
 	f.cached.slope = [2]int32{run, rise}
 	f.cached.unitsPerEm = unitsPerEm
 	f.cached.xHeight = xHeight
+
+	if os2Vers <= 1 {
+		xh, ch, err := f.initOS2Version1()
+		if err != nil {
+			return err
+		}
+		f.cached.xHeight = xh
+		f.cached.capHeight = ch
+	}
 
 	return nil
 }
@@ -1065,22 +1074,80 @@ func (f *Font) parseGlyphData(buf []byte, numGlyphs int32, indexToLocFormat, isP
 	return buf, ret, isColorBitmap, nil
 }
 
-func (f *Font) parseOS2(buf []byte) (buf1 []byte, xHeight, capHeight int32, err error) {
-	// https://docs.microsoft.com/da-dk/typography/opentype/spec/os2
+func (f *Font) glyphTopOS2(b *Buffer, ppem fixed.Int26_6, r rune) (int32, error) {
+	ind, err := f.GlyphIndex(b, r)
+	if err != nil && err != ErrNotFound {
+		return 0, err
+	} else if ind == 0 {
+		return 0, nil
+	}
+	// Y axis points down
+	var min fixed.Int26_6
+	seg, err := f.LoadGlyph(b, ind, ppem, nil)
+	if err != nil {
+		return 0, err
+	}
+	for _, s := range seg {
+		for _, p := range s.Args {
+			if p.Y < min {
+				min = p.Y
+			}
+		}
+	}
+	return int32(min), nil
+}
 
+func (f *Font) initOS2Version1() (xHeight, capHeight int32, err error) {
+	ppem := fixed.Int26_6(f.UnitsPerEm())
+	var b Buffer
+
+	// sxHeight equal to the top of the unscaled and unhinted glyph bounding box
+	// of the glyph encoded at U+0078 (LATIN SMALL LETTER X).
+	xh, err := f.glyphTopOS2(&b, ppem, 'x')
+	if err != nil {
+		return 0, 0, err
+	}
+
+	// sCapHeight may be set equal to the top of the unscaled and unhinted glyph
+	// bounding box of the glyph encoded at U+0048 (LATIN CAPITAL LETTER H).
+	ch, err := f.glyphTopOS2(&b, ppem, 'H')
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return int32(xh), int32(ch), nil
+}
+
+func (f *Font) parseOS2(buf []byte) (buf1 []byte, version uint16, xHeight, capHeight int32, err error) {
+	// https://docs.microsoft.com/da-dk/typography/opentype/spec/os2
+	if f.os2.length < 2 {
+		return nil, 0, 0, 0, errInvalidOS2Table
+	}
+	vers, err := f.src.u16(buf, f.os2, 0)
+	if err != nil {
+		return nil, 0, 0, 0, err
+	}
+	if vers <= 1 {
+		const headerSize = 86
+		if f.os2.length < headerSize {
+			return nil, 0, 0, 0, errInvalidOS2Table
+		}
+		// Will resolve xHeight and capHeight later, see initOS2Version1.
+		return buf, vers, 0, 0, nil
+	}
 	const headerSize = 96
 	if f.os2.length < headerSize {
-		return nil, 0, 0, errInvalidOS2Table
+		return nil, 0, 0, 0, errInvalidOS2Table
 	}
 	xh, err := f.src.u16(buf, f.os2, 86)
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, 0, err
 	}
 	ch, err := f.src.u16(buf, f.os2, 88)
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, 0, err
 	}
-	return buf, int32(int16(xh)), int32(int16(ch)), nil
+	return buf, vers, int32(int16(xh)), int32(int16(ch)), nil
 }
 
 func (f *Font) parsePost(buf []byte, numGlyphs int32) (buf1 []byte, postTableVersion uint32, err error) {

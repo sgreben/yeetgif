@@ -8,6 +8,7 @@ import (
 	"sync"
 )
 
+// OpaqueBounds returns a bounding box for the given image
 func OpaqueBounds(img image.Image, threshold uint8) image.Rectangle {
 	src := newScanner(img)
 	out := image.Rectangle{}
@@ -21,25 +22,92 @@ func OpaqueBounds(img image.Image, threshold uint8) image.Rectangle {
 			for x := 0; x < src.w; x++ {
 				a := dst.Pix[i+3]
 				i += 4
-				if a > threshold && first {
+				if a > threshold {
 					mu.Lock()
-					out.Min = image.Point{x, y}
-					out.Max = out.Min
-					first = false
+					if first {
+						out.Min = image.Point{x, y}
+						out.Max = out.Min
+						first = false
+					}
 					mu.Unlock()
 				}
-				if a > threshold && !first {
+				if a > threshold {
 					mu.Lock()
-					out.Min.X = int(math.Min(float64(x), float64(out.Min.X)))
-					out.Min.Y = int(math.Min(float64(y), float64(out.Min.Y)))
-					out.Max.X = int(math.Max(float64(x), float64(out.Max.X)))
-					out.Max.Y = int(math.Max(float64(y), float64(out.Max.Y)))
+					if !first {
+						out.Min.X = int(math.Min(float64(x), float64(out.Min.X)))
+						out.Min.Y = int(math.Min(float64(y), float64(out.Min.Y)))
+						out.Max.X = int(math.Max(float64(x), float64(out.Max.X)))
+						out.Max.Y = int(math.Max(float64(y), float64(out.Max.Y)))
+					}
 					mu.Unlock()
 				}
 			}
 		}
 	})
 	return out
+}
+
+// OpaquePolygon returns a bounding polygon for the given image
+func OpaquePolygon(img image.Image, n int, threshold uint8) (out []image.Point) {
+	bounds := OpaqueBounds(img, threshold)
+	src := newScanner(img)
+	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
+	out = make([]image.Point, 2*n)
+	var (
+		pointsLeft  = out[:n]
+		pointsRight = out[n : 2*n]
+	)
+	yStep := float64(bounds.Dy()-1) / float64(n-1)
+	w := bounds.Dx()
+	// Left, Right
+	parallel(0, n, func(ks <-chan int) {
+		for k := range ks {
+			y := int(math.Floor(float64(bounds.Min.Y) + float64(k)*yStep))
+			i := (y - bounds.Min.Y) * 4 * w
+			src.scan(bounds.Min.X, y, bounds.Max.X, y+1, dst.Pix[i:i+w*4])
+			foundLeft := false
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				i += 4
+				a := dst.Pix[i+3]
+				if a <= threshold {
+					continue
+				}
+				pointsRight[k].X = x
+				pointsRight[k].Y = y
+				if foundLeft {
+					continue
+				}
+				foundLeft = true
+				pointsLeft[n-1-k].X = x
+				pointsLeft[n-1-k].Y = y
+			}
+		}
+	})
+	// h := bounds.Dy()
+	// xMinStep := 3.0
+	return out
+}
+
+// OpaqueArea returns the opaque area (in pixels) of the image
+func OpaqueArea(img image.Image, threshold uint8) int {
+	var (
+		src             = newScanner(img)
+		dst             = image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
+		numPixelsOpaque = 0
+	)
+	parallel(0, src.h, func(ys <-chan int) {
+		for y := range ys {
+			i := y * 4
+			src.scan(0, y, src.w, y+1, dst.Pix[i:i+src.w*4])
+			for x := 0; x < src.w; x++ {
+				i += 4
+				if a := dst.Pix[i+3]; a > threshold {
+					numPixelsOpaque++
+				}
+			}
+		}
+	})
+	return numPixelsOpaque
 }
 
 // New creates a new image with the specified width and height, and fills it with the specified color.
@@ -184,6 +252,61 @@ func Paste(background, img image.Image, pos image.Point) *image.NRGBA {
 			src.scan(x1, y1, x2, y2, dst.Pix[i1:i2])
 		}
 	})
+	return dst
+}
+
+func OverlayOnCanvas(w, h int, bgColor color.Color, images []struct {
+	Image image.Image
+	Point image.Point
+}) *image.NRGBA {
+	dst := New(w, h, bgColor)
+	for imgIndex := range images {
+		img := images[imgIndex].Image
+		pos := images[imgIndex].Point.Sub(dst.Bounds().Min)
+		pasteRect := image.Rectangle{Min: pos, Max: pos.Add(img.Bounds().Size())}
+		interRect := pasteRect.Intersect(dst.Bounds())
+		if interRect.Empty() {
+			continue
+		}
+		src := newScanner(img)
+		parallel(interRect.Min.Y, interRect.Max.Y, func(ys <-chan int) {
+			scanLine := make([]uint8, interRect.Dx()*4)
+			for y := range ys {
+				x1 := interRect.Min.X - pasteRect.Min.X
+				x2 := interRect.Max.X - pasteRect.Min.X
+				y1 := y - pasteRect.Min.Y
+				y2 := y1 + 1
+				src.scan(x1, y1, x2, y2, scanLine)
+				i := y*dst.Stride + interRect.Min.X*4
+				j := 0
+				for x := interRect.Min.X; x < interRect.Max.X; x++ {
+					r1 := float64(dst.Pix[i+0])
+					g1 := float64(dst.Pix[i+1])
+					b1 := float64(dst.Pix[i+2])
+					a1 := float64(dst.Pix[i+3])
+
+					r2 := float64(scanLine[j+0])
+					g2 := float64(scanLine[j+1])
+					b2 := float64(scanLine[j+2])
+					a2 := float64(scanLine[j+3])
+
+					coef2 := a2 / 255
+					coef1 := (1 - coef2) * a1 / 255
+					coefSum := coef1 + coef2
+					coef1 /= coefSum
+					coef2 /= coefSum
+
+					dst.Pix[i+0] = uint8(r1*coef1 + r2*coef2)
+					dst.Pix[i+1] = uint8(g1*coef1 + g2*coef2)
+					dst.Pix[i+2] = uint8(b1*coef1 + b2*coef2)
+					dst.Pix[i+3] = uint8(math.Min(a1+a2*(255-a1)/255, 255))
+
+					i += 4
+					j += 4
+				}
+			}
+		})
+	}
 	return dst
 }
 

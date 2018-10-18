@@ -10,6 +10,7 @@ import (
 )
 
 func CommandResize(cmd *cli.Cmd) {
+	cmd.Before = Input
 	cmd.Spec = "[OPTIONS]"
 	var (
 		s = gifcmd.Float{Value: 1.0}
@@ -28,13 +29,15 @@ func CommandResize(cmd *cli.Cmd) {
 	}
 }
 
+func ResizeScale1(img image.Image, scale float64) image.Image {
+	b := img.Bounds()
+	width, height := float64(b.Dx()), float64(b.Dy())
+	return imaging.Resize(img, int(width*scale), int(height*scale), imaging.Lanczos)
+}
+
 // ResizeScale resizes by a factor
 func ResizeScale(images []image.Image, scale float64) {
-	resize := func(i int) {
-		b := images[i].Bounds()
-		width, height := float64(b.Dx()), float64(b.Dy())
-		images[i] = imaging.Resize(images[i], int(width*scale), int(height*scale), imaging.Lanczos)
-	}
+	resize := func(i int) { images[i] = ResizeScale1(images[i], scale) }
 	parallel(len(images), resize)
 }
 

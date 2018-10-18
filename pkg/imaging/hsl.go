@@ -44,11 +44,11 @@ func HSLA(c color.RGBA) (h, s, l, a float64) {
 }
 
 func RGBA(h, s, l, a float64) (c color.RGBA) {
-	for h > 1 {
-		h--
-	}
-	for h < 0 {
-		h++
+	switch {
+	case h < 0:
+		h = -(h - math.Ceil(h))
+	case h > 1:
+		h = h - math.Floor(h)
 	}
 	s = math.Max(0, math.Min(s, 1))
 	l = math.Max(0, math.Min(l, 1))

@@ -12,21 +12,22 @@ import (
 )
 
 func CommandFried(cmd *cli.Cmd) {
+	cmd.Before = InputAndDuplicate
 	cmd.Spec = "[OPTIONS]"
 	var (
-		a          = gifcmd.Float{Value: 0.33}
-		b          = gifcmd.Float{Value: 0.2}
-		c          = gifcmd.Float{Value: 0.9}
+		a          = gifcmd.FloatsCSV{Values: []float64{0.33}}
+		b          = gifcmd.FloatsCSV{Values: []float64{0.2}}
+		c          = gifcmd.FloatsCSV{Values: []float64{0.9}}
 		clip       = cmd.BoolOpt("clip", true, "")
-		q          = cmd.IntOpt("j jpeg", 84, "[0,100]")
+		q          = gifcmd.FloatsCSV{Values: []float64{84}}
 		w          = cmd.IntOpt("w walk", 10, "🌀")
-		t          = gifcmd.Float{Value: 0.4}
-		n          = gifcmd.Float{Value: 1.0}
-		n1         = gifcmd.Float{Value: 0.02}
-		n2         = gifcmd.Float{Value: 0.5}
-		n3         = gifcmd.Float{Value: 0.1}
-		saturation = gifcmd.Float{Value: 3.0}
-		contrast   = gifcmd.Float{Value: 6.0}
+		t          = gifcmd.FloatsCSV{Values: []float64{0.4}}
+		n          = gifcmd.FloatsCSV{Values: []float64{1.0}}
+		n1         = gifcmd.FloatsCSV{Values: []float64{0.02}}
+		n2         = gifcmd.FloatsCSV{Values: []float64{0.5}}
+		n3         = gifcmd.FloatsCSV{Values: []float64{0.1}}
+		saturation = gifcmd.FloatsCSV{Values: []float64{3.0}}
+		contrast   = gifcmd.FloatsCSV{Values: []float64{6.0}}
 		iterations = cmd.IntOpt("i iterations", 1, "")
 	)
 	cmd.VarOpt("a", &a, "🅰️")
@@ -36,33 +37,39 @@ func CommandFried(cmd *cli.Cmd) {
 	cmd.VarOpt("noise1", &n1, "🌀️")
 	cmd.VarOpt("noise2", &n2, "🌀️")
 	cmd.VarOpt("noise3", &n3, "🌀")
+	cmd.VarOpt("j jpeg", &q, "[0,100]")
 	cmd.VarOpt("u saturation", &saturation, "")
 	cmd.VarOpt("o contrast", &contrast, "")
 	cmd.VarOpt("t tint", &t, "tint")
 	cmd.Action = func() {
-		n1.Value *= n.Value
-		n2.Value *= n.Value
-		n3.Value *= n.Value
-		if *q > 100 {
-			*q = 100
-		}
-		if *q < 0 {
-			*q = 0
+		if *iterations > 1 {
+			for i, v := range t.Values {
+				t.Values[i] = v / float64(*iterations)
+			}
 		}
 		for i := 0; i < *iterations; i++ {
-			Fried(images, t.Value, a.Value, b.Value, c.Value, *q, *w, saturation.Value, contrast.Value, n1.Value, n2.Value, n3.Value, *clip)
+			Fried(
+				images,
+				t.PiecewiseLinear(0, 1),
+				a.PiecewiseLinear(0, 1),
+				b.PiecewiseLinear(0, 1),
+				c.PiecewiseLinear(0, 1),
+				q.PiecewiseLinear(0, 1),
+				*w,
+				saturation.PiecewiseLinear(0, 1),
+				contrast.PiecewiseLinear(0, 1),
+				n.PiecewiseLinear(0, 1),
+				n1.PiecewiseLinear(0, 1),
+				n2.PiecewiseLinear(0, 1),
+				n3.PiecewiseLinear(0, 1),
+				*clip,
+			)
 		}
 	}
 }
 
 // Fried meme
-func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturation, contrast, noise1, noise2, noise3 float64, clip bool) {
-	if loss < 0 {
-		loss = 0
-	}
-	if loss > 100 {
-		loss = 100
-	}
+func Fried(images []image.Image, tintF, aF, bF, cF, lossF func(float64) float64, step int, saturationF, contrastF, noiseF, noise1F, noise2F, noise3F func(float64) float64, clip bool) {
 	jpeg := func(i, quality int) {
 		buf := &bytes.Buffer{}
 		imaging.Encode(buf, images[i], imaging.JPEG, imaging.JPEGQuality(quality))
@@ -87,20 +94,29 @@ func Fried(images []image.Image, tint, a, b, c float64, loss, step int, saturati
 		explodePoint.Y += int(rand.Float64()*2*float64(step)) - step
 	}
 	fry := func(i int) {
+		t := float64(i) / float64(n)
 		explodePoint := explodePoints[i]
 		original := images[i]
-		images[i] = imaging.Ripples(images[i], explodePoint, a, b, c)
+		images[i] = imaging.FriedDistortion1(images[i], explodePoint, aF(t), bF(t), cF(t))
 		exploded := images[i]
-		images[i] = imaging.AdjustTint(images[i], tint, orange)
-		images[i] = imaging.AdjustNoiseHSL(images[i], noise1, noise2, noise3)
+		images[i] = imaging.AdjustTint(images[i], tintF(t), orange)
+		noise, noise1, noise2, noise3 := noiseF(t), noise1F(t), noise2F(t), noise3F(t)
+		images[i] = imaging.AdjustNoiseHSL(images[i], noise*noise1, noise*noise2, noise*noise3)
+		loss := int(lossF(t))
+		if loss < 0 {
+			loss = 0
+		}
+		if loss > 100 {
+			loss = 100
+		}
 		jpeg(i, 100-loss)
-		images[i] = imaging.AdjustSaturation(images[i], saturation)
-		images[i] = imaging.AdjustSigmoid(images[i], 0.5, contrast)
+		images[i] = imaging.AdjustSaturation(images[i], saturationF(t))
+		images[i] = imaging.AdjustSigmoid(images[i], 0.5, contrastF(t))
 		jpeg(i, 100-(loss/2))
 		if clip {
 			images[i] = imaging.OverlayWithOp(images[i], original, image.ZP, imaging.OpReplaceAlpha)
 		}
 		images[i] = imaging.OverlayWithOp(images[i], exploded, image.ZP, imaging.OpMinAlpha)
 	}
-	parallel(len(images), fry)
+	parallel(len(images), fry, "fry")
 }

@@ -9,7 +9,9 @@ RUN cp "$(which gifsicle)" /gifsicle
 FROM golang:1.11-alpine3.8 AS build-app
 RUN apk add --no-cache git
 WORKDIR ${GOPATH}/src/github.com/sgreben/yeetgif
-COPY cmd/gif cmd/gif
+COPY vendor/ vendor/
+COPY pkg/ pkg/
+COPY cmd/ cmd/
 RUN go build ./cmd/gif && mv gif /app
 
 # app image

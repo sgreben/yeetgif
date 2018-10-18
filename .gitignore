@@ -2,3 +2,4 @@
 /binaries
 /release
 /*.gif
+/vendor/golang.org/x/image/testdata

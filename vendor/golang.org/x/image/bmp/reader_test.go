@@ -38,8 +38,10 @@ func compare(img0, img1 image.Image) error {
 // same pixel data.
 func TestDecode(t *testing.T) {
 	testCases := []string{
+		"colormap",
 		"video-001",
 		"yellow_rose-small",
+		"yellow_rose-small-v5",
 	}
 
 	for _, tc := range testCases {

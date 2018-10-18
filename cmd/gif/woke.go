@@ -13,6 +13,7 @@ import (
 )
 
 func CommandWoke(cmd *cli.Cmd) {
+	cmd.Before = InputAndDuplicate
 	cmd.Spec = "[OPTIONS] POINTS"
 	const (
 		typeFull   = "full"
@@ -63,7 +64,7 @@ func CommandWoke(cmd *cli.Cmd) {
 		alphaT := at.Value
 		alphaP := ap.Value
 		alphaV := alpha.Value
-		flare = imaging.AdjustHSLAFunc(flare, func(h, s, l, a *float64) {
+		flare = imaging.AdjustHSLAFunc(flare, func(_, _ int, h, s, l, a *float64) {
 			*a = math.Pow(*a, alphaP) * alphaV
 			if *a < alphaT {
 				*a = 0
@@ -112,5 +113,5 @@ func Woke(images []image.Image, flare image.Image, random float64, flares []imag
 		}
 		images[i] = woke
 	}
-	parallel(len(images), woke)
+	parallel(len(images), woke, "woke")
 }

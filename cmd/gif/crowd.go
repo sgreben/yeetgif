@@ -11,6 +11,7 @@ import (
 )
 
 func CommandCrowd(cmd *cli.Cmd) {
+	cmd.Before = InputAndDuplicate
 	var (
 		n   = cmd.IntOpt("n", 3, "crowd size")
 		rpx = gifcmd.Float{Value: 0.5}
@@ -103,6 +104,6 @@ func Crowd(images []image.Image, k int, rf bool, rpx, rpy, rs, ra, rr, ro float6
 	overwrite := func(i int) {
 		originals[i] = images[i]
 	}
-	parallel(len(images), crowd)
+	parallel(len(images), crowd, "crowd")
 	parallel(len(images), overwrite)
 }

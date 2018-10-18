@@ -177,11 +177,19 @@ func Rotate(img image.Image, angle float64, bgColor color.Color) *image.NRGBA {
 	return dst
 }
 
-func sigmoidInv(a, b, y float64) float64 {
-	return -((math.Log((1/y)-1) / b) - a)
+func RotateAbout(img image.Image, p image.Point, angle float64, bgColor color.Color) *image.NRGBA {
+	srcB := img.Bounds()
+	center := image.Point{
+		X: srcB.Dx() / 2,
+		Y: srcB.Dy() / 2,
+	}
+	offset := p.Sub(center)
+	dstB := srcB.Union(srcB.Add(offset))
+	offset = offset.Sub(dstB.Min)
+	return Rotate(Paste(New(dstB.Dx(), dstB.Dy(), bgColor), img, offset), angle, bgColor)
 }
 
-func Ripples(img image.Image, position image.Point, a, b, c float64) *image.NRGBA {
+func FriedDistortion1(img image.Image, position image.Point, a, b, c float64) *image.NRGBA {
 	src := toNRGBA(img)
 	srcW := src.Bounds().Max.X
 	srcH := src.Bounds().Max.Y

@@ -5,7 +5,7 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
+	"github.com/sgreben/piecewiselinear"
 
 	cli "github.com/jawher/mow.cli"
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
@@ -13,7 +13,8 @@ import (
 )
 
 func CommandWobble(cmd *cli.Cmd) {
-	cmd.Spec = "[OPTIONS]"
+	cmd.Before = InputAndDuplicate
+	cmd.Spec = "[OPTIONS] [CUSTOM]"
 	const (
 		wobbleTypeSine   = "sine"
 		wobbleTypeSnap   = "snap"
@@ -40,7 +41,8 @@ func CommandWobble(cmd *cli.Cmd) {
 	cmd.VarOpt("a amplitude", &a, "")
 	cmd.VarOpt("p phase", &ph, "")
 	cmd.VarOpt("t type", &t, t.Help())
-	cmd.VarOpt("custom", &c, "comma-separated angles (°), e.g. 0,10,0,60,0")
+	cmd.VarOpt("custom", &c, "(deprecated)")
+	cmd.VarArg("CUSTOM", &c, "comma-separated angles (°), e.g. 0,10,0,60,0")
 	cmd.Action = func() {
 		if len(c.Texts) > 0 {
 			t.Value = wobbleTypeCustom
@@ -78,12 +80,8 @@ func CommandWobble(cmd *cli.Cmd) {
 			x := w*stickyF.At(t) + (1-w)*s
 			return amplitude * x
 		}
-		customF := piecewiselinear.Function{}
-		k := float64(len(c.Values) - 1)
-		for i := 0; i < len(c.Values); i++ {
-			customF.X = append(customF.X, float64(i)/k)
-			customF.Y = append(customF.Y, float64((c.Values)[i]))
-		}
+		customF := piecewiselinear.Function{Y: c.Values}
+		customF.X = piecewiselinear.Span(0, 1, len(customF.Y))
 		fs := map[string]func(float64) float64{
 			wobbleTypeSine:   sine,
 			wobbleTypeSaw:    saw,
@@ -113,5 +111,5 @@ func Wobble(images []image.Image, f func(float64) float64) {
 			images[i] = imaging.Crop(images[i], bPre)
 		}
 	}
-	parallel(len(images), rotate)
+	parallel(len(images), rotate, "wobble")
 }

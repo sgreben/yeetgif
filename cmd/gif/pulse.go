@@ -4,24 +4,31 @@ import (
 	"image"
 	"math"
 
-	"github.com/sgreben/yeetgif/pkg/imaging"
 	cli "github.com/jawher/mow.cli"
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
+	"github.com/sgreben/yeetgif/pkg/imaging"
 )
 
 func CommandPulse(cmd *cli.Cmd) {
-	cmd.Spec = "[OPTIONS]"
+	cmd.Before = InputAndDuplicate
+	cmd.Spec = "[OPTIONS] [ZOOM_LEVELS_CSV]"
 	var (
-		from = gifcmd.Float{Value: 1.0}
-		f    = gifcmd.Float{Value: 1.0}
-		ph   = gifcmd.Float{Value: 0.0}
-		to   = gifcmd.Float{Value: 1.5}
+		from   = gifcmd.Float{Value: 0.9}
+		f      = gifcmd.Float{Value: 1.0}
+		ph     = gifcmd.Float{Value: 0.0}
+		to     = gifcmd.Float{Value: 1.0}
+		custom = gifcmd.FloatsCSV{}
 	)
 	cmd.VarOpt("0 from", &from, "")
 	cmd.VarOpt("1 to", &to, "")
 	cmd.VarOpt("f frequency", &f, "")
 	cmd.VarOpt("p phase", &ph, "")
+	cmd.VarArg("ZOOM_LEVELS_CSV", &custom, "")
 	cmd.Action = func() {
+		if len(custom.Texts) > 0 {
+			Pulse(images, custom.PiecewiseLinear(0, 1))
+			return
+		}
 		frequency := f.Value
 		phase := ph.Value
 		left := from.Value
@@ -53,5 +60,5 @@ func Pulse(images []image.Image, f func(float64) float64) {
 			images[i] = imaging.Crop(images[i], bPre)
 		}
 	}
-	parallel(len(images), scale)
+	parallel(len(images), scale, "pulse")
 }

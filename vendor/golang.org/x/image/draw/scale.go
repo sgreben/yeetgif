@@ -65,7 +65,7 @@ type Options struct {
 	// the src image are drawn from.
 	//
 	// A dst or src mask image having a zero alpha (transparent) pixel value in
-	// the respective coordinate space means that that dst pixel is entirely
+	// the respective coordinate space means that dst pixel is entirely
 	// unaffected or that src pixel is considered transparent black. A full
 	// alpha (opaque) value means that the dst pixel is maximally affected or
 	// the src pixel contributes maximally. The default values, nil, are

@@ -3,7 +3,7 @@
 APP=gif
 NAME := yeetgif
 REPOSITORY := quay.io/sergey_grebenshchikov/$(NAME)
-VERSION := 1.14.0
+VERSION := 1.23.4
 VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)" | cut -c 1-8)
 
 PACKAGES := $(shell go list -f {{.Dir}} ./...)
@@ -33,13 +33,13 @@ release: zip README.md
 	git push
 	hub release create $(VERSION) -m "$(VERSION)" -a release/$(APP)_$(VERSION)_osx_x86_64.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_64.zip -a release/$(APP)_$(VERSION)_linux_x86_64.tar.gz -a release/$(APP)_$(VERSION)_osx_x86_32.tar.gz -a release/$(APP)_$(VERSION)_windows_x86_32.zip -a release/$(APP)_$(VERSION)_linux_x86_32.tar.gz -a release/$(APP)_$(VERSION)_linux_arm64.tar.gz
 
-README.md: binary examples
-	<README.template.md subst USAGE_chop="$$($(APP) chop -h 2>&1)" USAGE_erase="$$($(APP) erase -h 2>&1)" USAGE_roll="$$($(APP) roll -h 2>&1)" USAGE_wobble="$$($(APP) wobble -h 2>&1)" USAGE_pulse="$$($(APP) pulse -h 2>&1)" USAGE_zoom="$$($(APP) zoom -h 2>&1)" USAGE_shake="$$($(APP) shake -h 2>&1)" USAGE_woke="$$($(APP) woke -h 2>&1)" USAGE_fried="$$($(APP) fried -h 2>&1)" USAGE_hue="$$($(APP) hue -h 2>&1)" USAGE_tint="$$($(APP) tint -h 2>&1)" USAGE_resize="$$($(APP) resize -h 2>&1)" USAGE_crop="$$($(APP) crop -h 2>&1)" USAGE_optimize="$$($(APP) optimize -h 2>&1)" USAGE_compose="$$($(APP) compose -h 2>&1)" USAGE_crowd="$$($(APP) crowd -h 2>&1)" USAGE_nop="$$($(APP) nop -h 2>&1)" USAGE_meta="$$($(APP) meta -h 2>&1)" USAGE="$$($(APP) -h 2>&1)" VERSION="$(VERSION)" APP="$(APP)" >README.md
+README.md: binary
+	<README.template.md subst USAGE_rain="$$($(APP) rain -h 2>&1)" USAGE_npc="$$($(APP) npc -h 2>&1)" USAGE_emoji="$$($(APP) emoji -h 2>&1)" USAGE_text="$$($(APP) text -h 2>&1)" USAGE_chop="$$($(APP) chop -h 2>&1)" USAGE_erase="$$($(APP) erase -h 2>&1)" USAGE_roll="$$($(APP) roll -h 2>&1)" USAGE_wobble="$$($(APP) wobble -h 2>&1)" USAGE_pulse="$$($(APP) pulse -h 2>&1)" USAGE_zoom="$$($(APP) zoom -h 2>&1)" USAGE_shake="$$($(APP) shake -h 2>&1)" USAGE_woke="$$($(APP) woke -h 2>&1)" USAGE_fried="$$($(APP) fried -h 2>&1)" USAGE_hue="$$($(APP) hue -h 2>&1)" USAGE_tint="$$($(APP) tint -h 2>&1)" USAGE_resize="$$($(APP) resize -h 2>&1)" USAGE_crop="$$($(APP) crop -h 2>&1)" USAGE_optimize="$$($(APP) optimize -h 2>&1)" USAGE_compose="$$($(APP) compose -h 2>&1)" USAGE_crowd="$$($(APP) crowd -h 2>&1)" USAGE_cat="$$($(APP) cat -h 2>&1)" USAGE_meta="$$($(APP) meta -h 2>&1)" USAGE="$$($(APP) -h 2>&1)" VERSION="$(VERSION)" APP="$(APP)" >README.md
 
-examples: doc/terminal.gif doc/roll.gif doc/wobble.gif doc/pulse.gif doc/zoom.gif doc/shake.gif doc/woke.gif doc/fried.gif doc/hue.gif doc/tint.gif doc/compose.gif doc/crowd.gif doc/erase.gif
+examples: doc/terminal.gif doc/roll.gif doc/wobble.gif doc/pulse.gif doc/zoom.gif doc/shake.gif doc/woke.gif doc/fried.gif doc/hue.gif doc/tint.gif doc/compose.gif doc/crowd.gif doc/erase.gif doc/gunther.gif doc/rain.gif doc/rain-thonk.gif
 
 doc/terminal.gif: doc/wobble.gif
-	<doc/terminal.png gif -n 5 fried -j 0 -a 0 -t 0 -u 1 -o 1 -n 0.7 | gif compose -s 1.0 -p right doc/wobble.gif | gif optimize -x 0 -y 0 --kb=999 > doc/terminal.gif
+	<doc/terminal.png gif -n 5 fried -j 0 -a 0 -t 0 -u 1 -o 1 -n 0.9 | gif compose -s 1.0 -p right doc/wobble.gif | gif optimize -n --kb=999 > doc/terminal.gif
 
 doc/erase.gif: doc/skeledance.gif
 	<doc/skeledance.gif gif -d 80 erase -t 0.05 -s 100 >doc/erase.gif
@@ -49,6 +49,15 @@ doc/roll.gif:
 
 doc/wobble.gif:
 	<doc/eggplant.png gif -n 30 wobble -a 10 -f 2 > doc/wobble.gif
+
+doc/rain.gif:
+	gif -r emoji -s 64 aubergine | gif -r rain | gif optimize -n --kb=999 > doc/rain.gif
+
+doc/rain-thonk.gif:
+	zsh -c "gif -r emoji think | gif -r roll | gif -r rain <(gif -r emoji -s 96 aubergine) <(gif -r emoji -s 96 peach) | gif optimize -n --kb=4096 > doc/rain-thonk.gif"
+
+doc/rain-scream.gif:
+	zsh -c "gif -r emoji scream | gif -r pulse | gif -r rain <(gif -r emoji -s 100 baguette) | gif compose -z under <(gif -r zoom 1.1,1.0,1.1 <doc/galaxy.jpg) | gif -r fried -t 0.05 -u 1.5 -o 1.5 -n 1.1 -a 0.1 | gif optimize -n --kb=4096 > doc/rain-scream.gif"
 
 doc/pulse.gif:
 	<doc/eggplant.png gif pulse > doc/pulse.gif
@@ -76,6 +85,9 @@ doc/compose.gif:
 
 doc/crowd.gif:
 	<doc/wobble.gif gif crowd > doc/crowd.gif
+
+doc/gunther.gif:
+	<doc/gunther.jpg gif woke -t center -a 0.7 -s 1.3 "[[160,130],[245,130]]" | gif text "i showed u my skul gun answer me" | gif fried | gif zoom 1.1 | gif optimize -n --kb=999 > doc/gunther.gif
 
 binary:
 	go install ./cmd/$(APP)

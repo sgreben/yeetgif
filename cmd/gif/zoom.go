@@ -3,7 +3,7 @@ package main
 import (
 	"image"
 
-	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
+	"github.com/sgreben/piecewiselinear"
 
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
 
@@ -12,25 +12,20 @@ import (
 )
 
 func CommandZoom(cmd *cli.Cmd) {
-	cmd.Spec = "[OPTIONS]"
+	cmd.Before = InputAndDuplicate
+	cmd.Spec = "[OPTIONS] [ZOOM_LEVELS_CSV]"
 	var (
 		from = gifcmd.Float{Value: 1.0}
 		to   = gifcmd.Float{Value: 1.5}
 		c    = gifcmd.FloatsCSV{}
 	)
-	cmd.VarOpt("0 from", &from, "")
-	cmd.VarOpt("1 to", &to, "")
-	cmd.VarOpt("c custom", &c, "")
+	cmd.VarArg("ZOOM_LEVELS_CSV", &c, "e.g. 1.0,1.5 to zoom from 100% to 150%")
 	cmd.Action = func() {
 		var f func(float64) float64
 		switch {
 		case len(c.Texts) > 0:
-			customF := piecewiselinear.Function{}
-			k := float64(len(c.Values) - 1)
-			for i := 0; i < len(c.Values); i++ {
-				customF.X = append(customF.X, float64(i)/k)
-				customF.Y = append(customF.Y, float64((c.Values)[i]))
-			}
+			customF := piecewiselinear.Function{Y: c.Values}
+			customF.X = piecewiselinear.Span(0, 1, len(customF.Y))
 			f = customF.At
 		default:
 			f = func(t float64) float64 {
@@ -60,5 +55,5 @@ func Zoom(images []image.Image, f func(float64) float64) {
 		bPre.Max = bPre.Max.Add(offset)
 		images[i] = imaging.Crop(images[i], bPre)
 	}
-	parallel(len(images), scale)
+	parallel(len(images), scale, "zoom")
 }

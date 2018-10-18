@@ -11,6 +11,7 @@ import (
 )
 
 func CommandErase(cmd *cli.Cmd) {
+	cmd.Before = Input
 	var (
 		t  = gifcmd.Float{Value: 0.2}
 		x  = cmd.IntOpt("x sample-x", 3, "")
@@ -35,7 +36,7 @@ func Erase(images []image.Image, x, y int, t, wh, ws, wl float64) {
 		sample := images[i].At(x, y)
 		r, g, b, _ := sample.RGBA()
 		sh, ss, sl, _ := imaging.HSLA(color.RGBA{uint8(r), uint8(g), uint8(b), 0})
-		images[i] = imaging.AdjustHSLAFunc(images[i], func(h, s, l, a *float64) {
+		images[i] = imaging.AdjustHSLAFunc(images[i], func(_, _ int, h, s, l, a *float64) {
 			dist := math.Sqrt((wh*sqr(*h-sh) + ws*sqr(*s-ss) + wl*sqr(*l-sl)) / (wh + ws + wl))
 			if dist < t/2 {
 				*a = 0
@@ -46,5 +47,5 @@ func Erase(images []image.Image, x, y int, t, wh, ws, wl float64) {
 			}
 		})
 	}
-	parallel(len(images), erase)
+	parallel(len(images), erase, "erase")
 }

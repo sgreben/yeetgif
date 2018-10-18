@@ -8,34 +8,43 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sort"
 
 	cli "github.com/jawher/mow.cli"
 )
 
 func CommandOptimize(cmd *cli.Cmd) {
+	cmd.Before = Input
 	cmd.Spec = "[OPTIONS]"
 	var (
 		k = cmd.IntOpt("kb", 128, "target file size (KB)")
-		w = cmd.IntOpt("x width", 128, "target width (pixels)")
-		h = cmd.IntOpt("y height", 128, "target height (pixels)")
+		n = cmd.BoolOpt("n no-resize", false, "don't resize the image")
+		w = cmd.IntOpt("x width", 0, "target width (pixels)")
+		h = cmd.IntOpt("y height", 0, "target height (pixels)")
 	)
 	cmd.Action = func() {
+		if !*n && *w == 0 && *h == 0 {
+			*w = 128
+			*h = 128
+		}
+		if *n {
+			*w = 0
+			*h = 0
+		}
 		Optimize(images, int64(*k), *w, *h)
 	}
 }
 
 func Optimize(images []image.Image, kb int64, w, h int) {
 	maxLoss := 400
-	maxColors := 256
 	lossStep := 10
-	colorsStep := 16
 	var resizeArg *string
 	switch {
 	case w > 0 && h == 0:
 		arg := fmt.Sprintf("--resize-width=%d", w)
 		resizeArg = &arg
 	case w == 0 && h > 0:
-		arg := fmt.Sprintf("--resize-height=%d", w)
+		arg := fmt.Sprintf("--resize-height=%d", h)
 		resizeArg = &arg
 	case w > 0 && h > 0:
 		arg := fmt.Sprintf("--resize-fit=%dx%d", w, h)
@@ -49,27 +58,33 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 	outputBuf := &bytes.Buffer{}
 	r := bytes.NewReader(inputBuf.Bytes())
 	os.Stderr.WriteString("\n")
-	for colors := maxColors + colorsStep; colors > 0; colors -= colorsStep {
-		var colorsArg *string
-		if colors <= maxColors {
-			arg := fmt.Sprintf("--colors=%d", colors)
-			colorsArg = &arg
-		}
-		for loss := 0; loss <= maxLoss; loss += lossStep {
-			outputBuf.Reset()
-			r.Seek(0, io.SeekStart)
-			args := []string{fmt.Sprintf("--lossy=%d", loss)}
+	gifsicleParams := func(colorsArg *string) (params [][]string) {
+		for loss := -lossStep; loss <= maxLoss; loss += lossStep {
+			var args []string
 			if resizeArg != nil {
 				args = append(args, *resizeArg)
 			}
 			if colorsArg != nil {
 				args = append(args, *colorsArg)
 			}
+			if loss >= 0 {
+				args = append(args, fmt.Sprintf("--lossy=%d", loss))
+			}
+			params = append(params, args)
+		}
+		return
+	}
+	tryOptimize := func(colorsArg *string) bool {
+		params := gifsicleParams(colorsArg)
+		return len(params) != sort.Search(len(params), func(i int) bool {
+			args := params[i]
 			cmd := exec.Command("gifsicle", args...)
 			in, err := cmd.StdinPipe()
 			if err != nil {
 				log.Fatal(err)
 			}
+			outputBuf.Reset()
+			r.Seek(0, io.SeekStart)
 			out, err := cmd.StdoutPipe()
 			if err != nil {
 				log.Fatal(err)
@@ -97,11 +112,28 @@ func Optimize(images []image.Image, kb int64, w, h int) {
 			sizeKB := n / 1024
 			log.Printf("%v: %dKB", cmd.Args, sizeKB)
 			if sizeKB <= kb {
-				encoded = outputBuf.Bytes()
+				encoded = make([]byte, n)
+				copy(encoded, outputBuf.Bytes())
 				images = images[:0]
-				return
+				return true
 			}
-		}
+			return false
+		})
+	}
+	if tryOptimize(nil) {
+		return
+	}
+	colorsArg := "--colors=256"
+	if tryOptimize(&colorsArg) {
+		return
+	}
+	colorsArg = "--colors=128"
+	if tryOptimize(&colorsArg) {
+		return
+	}
+	colorsArg = "--colors=64"
+	if tryOptimize(&colorsArg) {
+		return
 	}
 	log.Printf("could not get size below %dKB", kb)
 }

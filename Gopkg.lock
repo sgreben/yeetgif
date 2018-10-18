@@ -8,6 +8,24 @@
   revision = "bfdbba883ede94ebcbfbcfbe3747d3d2b7fde1fb"
 
 [[projects]]
+  name = "github.com/fogleman/gg"
+  packages = ["."]
+  revision = "a9ff18eccd6d57b3c8576a71a91a04868f62078c"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/gobwas/glob"
+  packages = [".","compiler","match","syntax","syntax/ast","syntax/lexer","util/runes","util/strings"]
+  revision = "5ccd90ef52e1e632236f7326478d4faa74f99438"
+  version = "v0.2.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/freetype"
+  packages = ["raster","truetype"]
+  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
+
+[[projects]]
   name = "github.com/jawher/mow.cli"
   packages = [".","internal/container","internal/flow","internal/fsm","internal/lexer","internal/matcher","internal/parser","internal/values"]
   revision = "2f22195f169da29d54624afd9eb83ada5c9e4ee9"
@@ -22,18 +40,30 @@
 [[projects]]
   name = "github.com/schollz/progressbar"
   packages = ["."]
-  revision = "793533abf0a5617116af09b675198569f62e39e8"
-  version = "v2.5.3"
+  revision = "174fa38cf3c3197ba99ada4c98deab7f79d07069"
+  version = "v2.6.0"
+
+[[projects]]
+  name = "github.com/sgreben/piecewiselinear"
+  packages = ["."]
+  revision = "3af66faddc7f4aa47d00a95ec4759c933fa3c1d8"
+  version = "1.1.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/image"
-  packages = ["bmp","tiff","tiff/lzw"]
-  revision = "991ec62608f3c0da01d400756917825d1e2fd528"
+  packages = ["bmp","draw","font","font/basicfont","font/plan9font","math/f64","math/fixed","tiff","tiff/lzw"]
+  revision = "69cc3646b96e61de0b417f4815b86c36e65783ee"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = ["internal/gen","internal/ucd","unicode/cldr","unicode/runenames"]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "51052d5fc8f25c6e35ed157c7defc8b30f9da2ece3e71ad63ee1cc1f926a16e2"
+  inputs-digest = "2c8f2e85307e1741ff2882ba554a58f264eb8b78510f06c58177f090d5a49e78"
   solver-name = "gps-cdcl"
   solver-version = 1
