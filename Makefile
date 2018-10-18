@@ -78,7 +78,7 @@ doc/crowd.gif:
 	<doc/wobble.gif gif crowd > doc/crowd.gif
 
 doc/gunther.gif:
-	<doc/gunther.jpg gif woke -t center -a 0.7 -s 1.3 "[[160,130],[245,130]]" | gif text "i showed you my skul gun answer me" | gif fried | gif zoom -0 1.1 -1 1.1 | gif optimize -x 0 -y 0 --kb=999 > doc/gunther.gif
+	<doc/gunther.jpg gif woke -t center -a 0.7 -s 1.3 "[[160,130],[245,130]]" | gif text "i showed u my skul gun answer me" | gif fried | gif zoom -0 1.1 -1 1.1 | gif optimize -x 0 -y 0 --kb=999 > doc/gunther.gif
 
 binary:
 	go install ./cmd/$(APP)
