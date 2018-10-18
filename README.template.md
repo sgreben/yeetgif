@@ -27,6 +27,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [crowd](#crowd)
     - [erase](#erase)
     - [chop](#chop)
+    - [text](#text)
     - [nop](#nop)
     - [meta](#meta)
 - [Licensing](#licensing)
@@ -194,6 +195,15 @@ ${USAGE_erase}
 ${USAGE_chop}
 ```
 
+### text
+
+![before](doc/gunther.jpg)![after](doc/gunther.gif)
+> woke | text | fried
+
+```text
+${USAGE_text}
+```
+
 ### nop
 
 ```text
@@ -221,3 +231,4 @@ ${USAGE_meta}
 
 - [Modified copy](pkg/imaging) of `github.com/disintegration/imaging`: [MIT License](pkg/imaging/LICENSE)
 - `yeetgif` itself: [MIT License](LICENSE)
+- [Roboto Regular TrueType Font](pkg/gifstatic/roboto.go): [Apache License 2.0](pkg/gifstatic/roboto.go-LICENSE)

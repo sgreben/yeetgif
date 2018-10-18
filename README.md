@@ -27,6 +27,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [crowd](#crowd)
     - [erase](#erase)
     - [chop](#chop)
+    - [text](#text)
     - [nop](#nop)
     - [meta](#meta)
 - [Licensing](#licensing)
@@ -43,14 +44,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.14.0/gif_1.14.0_linux_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.15.0/gif_1.15.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.14.0/gif_1.14.0_osx_x86_64.tar.gz | tar xz
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.15.0/gif_1.15.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.14.0/gif_1.14.0_windows_x86_64.zip
-unzip gif_1.14.0_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.15.0/gif_1.15.0_windows_x86_64.zip
+unzip gif_1.15.0_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -99,6 +100,7 @@ Commands:
   crowd              (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
   erase              ( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿
   chop               ✂️( ͡°Ĺ̯ ͡° )🔪
+  text               🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
@@ -392,6 +394,27 @@ Commands:
 Run 'gif chop COMMAND --help' for more information on a command.
 ```
 
+### text
+
+![before](doc/gunther.jpg)![after](doc/gunther.gif)
+> woke | text | fried
+
+```text
+
+Usage: gif text [OPTIONS] [TEXT]
+
+🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
+                             
+Arguments:                   
+  TEXT                       (default "#yeetgif")
+                             
+Options:                     
+  -a, --background-alpha     (default 0.7)
+  -s, --font-size            (default 18.5)
+  -y, --text-y               (default 0.3)
+  -p, --background-padding   (default 3)
+```
+
 ### nop
 
 ```text
@@ -432,3 +455,4 @@ Run 'gif meta COMMAND --help' for more information on a command.
 
 - [Modified copy](pkg/imaging) of `github.com/disintegration/imaging`: [MIT License](pkg/imaging/LICENSE)
 - `yeetgif` itself: [MIT License](LICENSE)
+- [Roboto Regular TrueType Font](pkg/gifstatic/roboto.go): [Apache License 2.0](pkg/gifstatic/roboto.go-LICENSE)

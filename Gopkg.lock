@@ -8,6 +8,18 @@
   revision = "bfdbba883ede94ebcbfbcfbe3747d3d2b7fde1fb"
 
 [[projects]]
+  name = "github.com/fogleman/gg"
+  packages = ["."]
+  revision = "a9ff18eccd6d57b3c8576a71a91a04868f62078c"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/freetype"
+  packages = ["raster","truetype"]
+  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
+
+[[projects]]
   name = "github.com/jawher/mow.cli"
   packages = [".","internal/container","internal/flow","internal/fsm","internal/lexer","internal/matcher","internal/parser","internal/values"]
   revision = "2f22195f169da29d54624afd9eb83ada5c9e4ee9"
@@ -22,18 +34,18 @@
 [[projects]]
   name = "github.com/schollz/progressbar"
   packages = ["."]
-  revision = "793533abf0a5617116af09b675198569f62e39e8"
-  version = "v2.5.3"
+  revision = "174fa38cf3c3197ba99ada4c98deab7f79d07069"
+  version = "v2.6.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/image"
-  packages = ["bmp","tiff","tiff/lzw"]
+  packages = ["bmp","draw","font","font/basicfont","font/gofont/goregular","font/plan9font","math/f64","math/fixed","tiff","tiff/lzw"]
   revision = "991ec62608f3c0da01d400756917825d1e2fd528"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "51052d5fc8f25c6e35ed157c7defc8b30f9da2ece3e71ad63ee1cc1f926a16e2"
+  inputs-digest = "52da06a4d6b836cdebbb5bdbbdd391246d0fa43c69afdfbc0c0e996ba59b1aa8"
   solver-name = "gps-cdcl"
   solver-version = 1
