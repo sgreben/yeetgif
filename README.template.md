@@ -228,7 +228,7 @@ ${USAGE_meta}
 
 ## Hall of Fame
 
-Tweet a GIF made with yeetgif using the [`#yeetgif`](https://twitter.com/hashtag/yeetgif) hashtag. Best ones end up below :)
+Tweet a GIF made using yeetgif with the [`#yeetgif`](https://twitter.com/hashtag/yeetgif) hashtag. Best ones end up below :)
 
 > No entries yet
 
