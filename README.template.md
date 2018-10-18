@@ -2,9 +2,9 @@
 
 Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Discord emoji :)
 
-![terminal](doc/terminal.gif)
+🙇‍‍**IF YOU MAKE A FUNNY GIF WITH THIS, PLEASE DO ME A FAVOR AND TWEET IT WITH THE [`#yeetgif`](https://twitter.com/hashtag/yeetgif) HASHTAG**🙇‍‍
 
-🙇‍‍**IF YOU MAKE A FUNNY GIF WITH THIS, PLEASE DO ME A FAVOR AND TWEET IT WITH THE [`#yeetgif`](https://twitter.com/hashtag/yeetgif) HASH TAG**🙇‍‍
+![terminal](doc/terminal.gif)
 
 <!-- TOC -->
 
