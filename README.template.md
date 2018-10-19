@@ -206,7 +206,7 @@ ${USAGE_text}
 
 ### emoji
 
-[example](doc/emoji.gif)
+![example](doc/emoji.gif)
 > emoji | compose <(emoji) | compose <(emoji) | wobble
 
 ```text
