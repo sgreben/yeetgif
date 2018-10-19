@@ -26,6 +26,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [erase](#erase)
     - [chop](#chop)
     - [text](#text)
+    - [emoji](#emoji)
     - [nop](#nop)
     - [meta](#meta)
 - [Hall of Fame](#hall-of-fame)
@@ -201,6 +202,15 @@ ${USAGE_chop}
 
 ```text
 ${USAGE_text}
+```
+
+### emoji
+
+[example](doc/emoji.gif)
+> emoji | compose <(emoji) | compose <(emoji) | wobble
+
+```text
+${USAGE_emoji}
 ```
 
 ### nop

@@ -26,6 +26,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [erase](#erase)
     - [chop](#chop)
     - [text](#text)
+    - [emoji](#emoji)
     - [nop](#nop)
     - [meta](#meta)
 - [Hall of Fame](#hall-of-fame)
@@ -43,14 +44,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.15.0/gif_1.15.0_linux_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.0/gif_1.16.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.15.0/gif_1.15.0_osx_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.0/gif_1.16.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.15.0/gif_1.15.0_windows_x86_64.zip
-unzip gif_1.15.0_windows_x86_64.zip
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.0/gif_1.16.0_windows_x86_64.zip
+unzip gif_1.16.0_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -100,6 +101,7 @@ Commands:
   erase              ( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿
   chop               ✂️( ͡°Ĺ̯ ͡° )🔪
   text               🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
+  emoji              ╰( ͡° ͜ʖ ͡° )つ──☆*🤔
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
@@ -414,6 +416,27 @@ Options:
   -p, --background-padding   (default 3)
 ```
 
+### emoji
+
+[example](doc/emoji.gif)
+> emoji | compose <(emoji) | compose <(emoji) | wobble
+
+```text
+
+Usage: gif emoji [OPTIONS] EMOJI...
+
+╰( ͡° ͜ʖ ͡° )つ──☆*🤔
+                    
+Arguments:          
+  EMOJI             (default ["face", "joy"])
+                    
+Options:            
+      --sub         match *EMOJI* (default true)
+  -o, --overlay     read images from stdin (instead of just creating one)
+  -l, --list-only   just list matches
+  -s, --font-size   (default 128)
+```
+
 ### nop
 
 ```text
@@ -461,3 +484,4 @@ Tweet a GIF made using yeetgif with the [`#yeetgif`](https://twitter.com/hashtag
 - [Modified copy](pkg/imaging) of `github.com/disintegration/imaging`: [MIT License](pkg/imaging/LICENSE)
 - `yeetgif` itself: [MIT License](LICENSE)
 - [Roboto Regular TrueType Font](pkg/gifstatic/roboto.go): [Apache License 2.0](pkg/gifstatic/roboto.go-LICENSE)
+- [Twemoji](pkg/gifstatic/emoji_twitter.go) by [Twitter](https://twemoji.twitter.com): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
