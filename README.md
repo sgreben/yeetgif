@@ -419,7 +419,7 @@ Options:
 ### emoji
 
 ![example](doc/emoji.gif)
-> emoji | compose <(emoji) | compose <(emoji) | wobble
+> emoji | compose <(emoji) | compose <(emoji) | wobble | fried
 
 ```text
 
