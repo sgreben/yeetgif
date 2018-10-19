@@ -62,7 +62,7 @@ brew install giflossy
 ## Use it
 
 ```sh
-<doc/yeet.png | gif fried | gif wobble | gif crop >doc/yeet.gif
+<doc/yeet.png gif fried | gif wobble | gif crop >doc/yeet.gif
 ```
 ![before](doc/yeet.png)
 ![after](doc/yeet.gif)
