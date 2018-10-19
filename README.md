@@ -452,9 +452,9 @@ Run 'gif meta COMMAND --help' for more information on a command.
 
 ## Hall of Fame
 
-Tweet a GIF made using yeetgif with the [`#yeetgif`](https://twitter.com/hashtag/yeetgif) hashtag. Best ones end up below :)
+Tweet a GIF made using yeetgif with the [`#yeetgif`](https://twitter.com/hashtag/yeetgif?f=tweets) hashtag. Best ones end up below!
 
-> No entries yet
+> No entries yet :(
 
 ## Licensing
 
