@@ -12,6 +12,7 @@ import (
 )
 
 func CommandFried(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		a          = gifcmd.Float{Value: 0.33}

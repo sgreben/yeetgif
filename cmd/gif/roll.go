@@ -10,6 +10,7 @@ import (
 )
 
 func CommandRoll(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		r = gifcmd.Float{Value: 1.0}

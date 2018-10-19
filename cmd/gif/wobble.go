@@ -13,6 +13,7 @@ import (
 )
 
 func CommandWobble(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	const (
 		wobbleTypeSine   = "sine"

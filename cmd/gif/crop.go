@@ -9,6 +9,7 @@ import (
 )
 
 func CommandCrop(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		t = gifcmd.Float{Value: 0.0}

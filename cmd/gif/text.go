@@ -16,10 +16,11 @@ import (
 )
 
 var (
-	font, _ = truetype.Parse(gifstatic.RobotoTTF)
+	textFont, _ = truetype.Parse(gifstatic.RobotoTTF)
 )
 
 func CommandText(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS] [TEXT]"
 	var (
 		a    = gifcmd.Float{Value: 0.7}
@@ -38,7 +39,7 @@ func CommandText(cmd *cli.Cmd) {
 }
 
 func Text(images []image.Image, alpha, padY, sizePoints, textYFactor float64, text string) {
-	fontFace := truetype.NewFace(font, &truetype.Options{Size: sizePoints})
+	fontFace := truetype.NewFace(textFont, &truetype.Options{Size: sizePoints})
 	var fontMutex sync.Mutex
 	padYBottomExtra := 6.0
 	write := func(i int) {

@@ -14,6 +14,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/gobwas/glob"
+  packages = [".","compiler","match","syntax","syntax/ast","syntax/lexer","util/runes","util/strings"]
+  revision = "5ccd90ef52e1e632236f7326478d4faa74f99438"
+  version = "v0.2.3"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/freetype"
   packages = ["raster","truetype"]
@@ -43,9 +49,15 @@
   packages = ["bmp","draw","font","font/basicfont","font/plan9font","math/f64","math/fixed","tiff","tiff/lzw"]
   revision = "991ec62608f3c0da01d400756917825d1e2fd528"
 
+[[projects]]
+  name = "golang.org/x/text"
+  packages = ["internal/gen","internal/ucd","unicode/cldr","unicode/runenames"]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "52ed32398eaf8a8c74f0841de03259a35b8219f94cf5567e80c8410139e85fd7"
+  inputs-digest = "e69a32d8f9ffa052fe1d3858943359c9368d4f0e1d06cd8e8e5bdb23252eafac"
   solver-name = "gps-cdcl"
   solver-version = 1

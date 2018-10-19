@@ -13,6 +13,7 @@ import (
 )
 
 func CommandOptimize(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		k = cmd.IntOpt("kb", 128, "target file size (KB)")

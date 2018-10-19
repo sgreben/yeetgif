@@ -11,6 +11,7 @@ import (
 )
 
 func CommandCrowd(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	var (
 		n   = cmd.IntOpt("n", 3, "crowd size")
 		rpx = gifcmd.Float{Value: 0.5}

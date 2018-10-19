@@ -11,6 +11,7 @@ import (
 )
 
 func CommandErase(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	var (
 		t  = gifcmd.Float{Value: 0.2}
 		x  = cmd.IntOpt("x sample-x", 3, "")

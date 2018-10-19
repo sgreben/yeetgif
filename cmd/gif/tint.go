@@ -10,6 +10,7 @@ import (
 )
 
 func CommandTint(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		f    = gifcmd.Float{Value: 1.0}

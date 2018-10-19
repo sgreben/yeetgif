@@ -20,6 +20,7 @@ type metaEntry struct {
 }
 
 func CommandMeta(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Command("show", "show 🧠", func(cmd *cli.Cmd) {
 		raw := cmd.BoolOpt("r raw", false, "print raw JSON")
 		pipe := cmd.BoolOpt("p pipe", false, "print shell pipe")

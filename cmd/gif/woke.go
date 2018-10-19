@@ -13,6 +13,7 @@ import (
 )
 
 func CommandWoke(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS] POINTS"
 	const (
 		typeFull   = "full"

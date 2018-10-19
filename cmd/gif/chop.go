@@ -8,6 +8,7 @@ import (
 )
 
 func CommandChop(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Command("shuffle", "", func(cmd *cli.Cmd) {
 		cmd.Action = func() {
 			rand.Shuffle(len(images), func(i, j int) {

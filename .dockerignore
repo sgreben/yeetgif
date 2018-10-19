@@ -1,4 +1,4 @@
 *
-!/cmd/**
-!/pkg/**
-!/vendor/**
+!/cmd
+!/pkg
+!/vendor

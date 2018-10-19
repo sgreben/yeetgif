@@ -12,6 +12,7 @@ import (
 )
 
 func CommandShake(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		random = gifcmd.Float{Value: 0.75}

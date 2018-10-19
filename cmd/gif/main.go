@@ -56,6 +56,7 @@ const (
 	commandChop     = "chop"
 	commandText     = "text"
 	commandMeta     = "meta"
+	commandEmoji    = "emoji"
 	commandErase    = "erase"
 	commandNop      = "nop"
 )
@@ -76,7 +77,6 @@ var (
 
 func main() {
 	app.Before = func() {
-		images = Input(os.Stdin)
 		config.Duplicate = *duplicate
 		config.Quiet = *quiet
 		config.Pad = *pad
@@ -85,7 +85,6 @@ func main() {
 		if config.Quiet {
 			log.SetOutput(ioutil.Discard)
 		}
-		CommandDuplicate(config.Duplicate)
 	}
 	app.Run(os.Args)
 	if !config.NoOutput {
@@ -95,6 +94,7 @@ func main() {
 
 func init() {
 	rand.Seed(time.Now().Unix())
+	log.SetFlags(0)
 	log.SetOutput(os.Stderr)
 	config.CliOptions = fmt.Sprintf("%v ", os.Args[1:])
 	log.SetPrefix(config.CliOptions)
@@ -116,6 +116,7 @@ func init() {
 	app.Command(commandErase, "( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿", CommandErase)
 	app.Command(commandChop, "✂️( ͡°Ĺ̯ ͡° )🔪", CommandChop)
 	app.Command(commandText, "🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️", CommandText)
+	app.Command(commandEmoji, "╰( ͡° ͜ʖ ͡° )つ──☆*🤔", CommandEmoji)
 	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) { cmd.Action = func() {} })
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", CommandMeta)
 }

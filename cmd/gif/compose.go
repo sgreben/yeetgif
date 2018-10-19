@@ -12,6 +12,7 @@ import (
 )
 
 func CommandCompose(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS] INPUT"
 	const (
 		orderUnder = "under"
@@ -91,6 +92,9 @@ func CommandCompose(cmd *cli.Cmd) {
 }
 
 func Compose(a, b []image.Image, p image.Point, anchorA, anchorB imaging.Anchor) {
+	if len(a) == 0 || len(b) == 0 {
+		return
+	}
 	compose := func(i int) {
 		ai := i % len(a)
 		bi := i % len(b)

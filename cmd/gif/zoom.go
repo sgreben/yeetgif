@@ -12,6 +12,7 @@ import (
 )
 
 func CommandZoom(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		from = gifcmd.Float{Value: 1.0}

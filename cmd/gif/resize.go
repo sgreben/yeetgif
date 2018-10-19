@@ -10,6 +10,7 @@ import (
 )
 
 func CommandResize(cmd *cli.Cmd) {
+	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
 	var (
 		s = gifcmd.Float{Value: 1.0}
