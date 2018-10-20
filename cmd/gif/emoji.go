@@ -18,10 +18,10 @@ func CommandEmoji(cmd *cli.Cmd) {
 	cmd.Spec = "[OPTIONS] EMOJI..."
 	var (
 		size       = gifcmd.Float{Value: 128}
-		alpha =  gifcmd.Float{Value:1.0}
+		alpha      = gifcmd.Float{Value: 1.0}
 		queryParts = cmd.StringsArg("EMOJI", nil, "one or more glob expressions")
 		exact      = cmd.BoolOpt("e exact", false, "match the query exactly")
-		pipe    = cmd.BoolOpt("p pipe", false, "overlay the emoji over input images (instead of just creating one)")
+		pipe       = cmd.BoolOpt("p pipe", false, "overlay the emoji over input images (instead of just creating one)")
 		list       = cmd.BoolOpt("l list-only", false, "just list matches")
 	)
 	cmd.VarOpt("s size", &size, "")
