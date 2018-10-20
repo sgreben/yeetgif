@@ -8,6 +8,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
 
 - [Get it](#get-it)
 - [Use it](#use-it)
+- [Hall of Fame](#hall-of-fame)
 - [Usage](#usage)
     - [roll](#roll)
     - [wobble](#wobble)
@@ -29,7 +30,6 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [emoji](#emoji)
     - [nop](#nop)
     - [meta](#meta)
-- [Hall of Fame](#hall-of-fame)
 - [Licensing](#licensing)
 
 <!-- /TOC -->
@@ -75,6 +75,11 @@ gif emoji aubergine | gif wobble >doc/eggplant_wobble.gif
 ![before](doc/eggplant.png)
 ![after](doc/eggplant_wobble.gif)
 
+## Hall of Fame
+
+Tweet a GIF made using yeetgif with the [`#yeetgif`](https://twitter.com/hashtag/yeetgif?f=tweets) hashtag. Best ones end up below!
+
+> No entries yet. Be the first :)
 
 ## Usage
 
@@ -480,12 +485,6 @@ Commands:
                
 Run 'gif meta COMMAND --help' for more information on a command.
 ```
-
-## Hall of Fame
-
-Tweet a GIF made using yeetgif with the [`#yeetgif`](https://twitter.com/hashtag/yeetgif?f=tweets) hashtag. Best ones end up below!
-
-> No entries yet :(
 
 ## Licensing
 
