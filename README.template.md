@@ -248,7 +248,7 @@ ${USAGE_emoji}
 
 ### npc
 
-![before](doc/gunther-small.gif)![example](doc/npc.gif)
+![before](doc/gunther-small.gif)![example](doc/npc.gif)![example](doc/npc-blur.gif)
 
 ```text
 ${USAGE_npc}

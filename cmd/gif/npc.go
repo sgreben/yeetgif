@@ -17,6 +17,10 @@ import (
 func CommandNPC(cmd *cli.Cmd) {
 	cmd.Before = ProcessInput
 	cmd.Spec = "[OPTIONS]"
+	const (
+		bgSolid = "solid"
+		bgBlur  = "blur"
+	)
 	var (
 		x           = gifcmd.FloatsCSV{Values: []float64{0.5}}
 		y           = gifcmd.FloatsCSV{Values: []float64{0.5}}
@@ -29,9 +33,11 @@ func CommandNPC(cmd *cli.Cmd) {
 		scaleH      = gifcmd.FloatsCSV{Values: []float64{1.0}}
 		angle       = gifcmd.FloatsCSV{Values: []float64{0}}
 		alpha       = gifcmd.FloatsCSV{Values: []float64{1}}
+		bgtype      = gifcmd.Enum{Choices: []string{bgSolid, bgBlur}, Value: bgSolid}
 	)
 	cmd.VarOpt("x", &x, "")
 	cmd.VarOpt("y", &y, "")
+	cmd.VarOpt("bg", &bgtype, bgtype.Help())
 	cmd.VarOpt("s scale", &scale, "")
 	cmd.VarOpt("scale-x", &scaleW, "")
 	cmd.VarOpt("scale-y", &scaleH, "")
@@ -41,9 +47,9 @@ func CommandNPC(cmd *cli.Cmd) {
 	cmd.VarOpt("mouth-scale-y", &mouthScaleH, "")
 	cmd.VarOpt("r angle", &angle, "")
 	cmd.VarOpt("a alpha", &alpha, "")
-	npcGrey := color.RGBA{R: 0xA3, G: 0xA3, B: 0xA3, A: 0xFF}
-	npcBlack := color.RGBA{R: 0x05, G: 0x05, B: 0x05, A: 0xFF}
 	cmd.Action = func() {
+		npcGrey := color.RGBA{R: 0xA3, G: 0xA3, B: 0xA3, A: 0xFF}
+		npcBlack := color.RGBA{R: 0x05, G: 0x05, B: 0x05, A: 0xFF}
 		fx := piecewiselinear.Function{Y: x.Values}
 		fx.SetDomain(0.0, 1.0)
 		fy := piecewiselinear.Function{Y: y.Values}
@@ -66,11 +72,11 @@ func CommandNPC(cmd *cli.Cmd) {
 		fangle.SetDomain(0.0, 1.0)
 		falpha := piecewiselinear.Function{Y: alpha.Values}
 		falpha.SetDomain(0.0, 1.0)
-		NPC(images, npcGrey, npcBlack, fx.At, fy.At, fscale.At, fscaleW.At, fscaleH.At, fangle.At, falpha.At, feyeScale.At, fnoseScale.At, fmouthScaleW.At, fmouthScaleH.At)
+		NPC(images, npcGrey, npcBlack, fx.At, fy.At, fscale.At, fscaleW.At, fscaleH.At, fangle.At, falpha.At, feyeScale.At, fnoseScale.At, fmouthScaleW.At, fmouthScaleH.At, bgtype.Value == bgBlur)
 	}
 }
 
-func NPC(images []image.Image, bg, fg color.Color, fx, fy, fscale, fscalew, fscaleh, fangle, falpha, feye, fnose, fmouthw, fmouthh func(float64) float64) {
+func NPC(images []image.Image, bg, fg color.RGBA, fx, fy, fscale, fscalew, fscaleh, fangle, falpha, feye, fnose, fmouthw, fmouthh func(float64) float64, blur bool) {
 	n := float64(len(images))
 	eyeDistance := 50
 	eyeRadius := 5
@@ -123,9 +129,17 @@ func NPC(images []image.Image, bg, fg color.Color, fx, fy, fscale, fscalew, fsca
 		midpoint.X -= delta.X
 		midpoint.Y -= delta.Y
 
+		if !blur {
+			bg.A = uint8(255 * alpha)
+		}
 		ctx.SetColor(bg)
 		ctx.DrawEllipse(float64(midpoint.X), float64(midpoint.Y-faceOffset), float64(faceW)/2, float64(faceH)/2)
 		ctx.Fill()
+		mask := ctx.AsMask()
+		if blur {
+			ctx.SetColor(color.Transparent)
+			ctx.Clear()
+		}
 
 		ctx.SetColor(fg)
 		eyeScale := feye(t)
@@ -153,7 +167,14 @@ func NPC(images []image.Image, bg, fg color.Color, fx, fy, fscale, fscalew, fsca
 		w, h := b.Dx(), b.Dy()
 		bNPC := npcImage.Bounds()
 		pos := image.Point{X: int(x*float64(w)) - bNPC.Dx()/2, Y: int(y*float64(h)) - bNPC.Dy()/2}
-		images[i] = imaging.Overlay(images[i], npcImage, pos, alpha)
+		if blur {
+			sigma := 10.0
+			blurred := imaging.Crop(images[i], bNPC.Add(pos))
+			blurred = imaging.Blur(blurred, sigma)
+			blurred = imaging.OverlayWithOp(blurred, mask, image.ZP, imaging.OpMinAlpha)
+			images[i] = imaging.Overlay(images[i], blurred, pos, 1.0)
+		}
+		images[i] = imaging.Overlay(images[i], npcImage, pos, 1.0)
 	}
 	parallel(len(images), npc)
 }

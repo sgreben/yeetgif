@@ -52,14 +52,14 @@ Either from [the releases page](https://github.com/sgreben/yeetgif/releases/late
 
 ```sh
 # Linux
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.17.0/gif_1.17.0_linux_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.0/gif_1.18.0_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.17.0/gif_1.17.0_osx_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.0/gif_1.18.0_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.17.0/gif_1.17.0_windows_x86_64.zip
-unzip gif_1.17.0_windows_x86_64.zip
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.0/gif_1.18.0_windows_x86_64.zip
+unzip gif_1.18.0_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -474,7 +474,7 @@ Options:
 
 ### npc
 
-![before](doc/gunther-small.gif)![example](doc/npc.gif)
+![before](doc/gunther-small.gif)![example](doc/npc.gif)![example](doc/npc-blur.gif)
 
 ```text
 
@@ -485,6 +485,7 @@ Usage: gif npc [OPTIONS]
 Options:                
   -x                    (default [0.5])
   -y                    (default [0.5])
+      --bg              one of [solid blur] (default solid)
   -s, --scale           (default [1])
       --scale-x         (default [1])
       --scale-y         (default [1])
