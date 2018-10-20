@@ -18,18 +18,20 @@ func CommandEmoji(cmd *cli.Cmd) {
 	cmd.Spec = "[OPTIONS] EMOJI..."
 	var (
 		size       = gifcmd.Float{Value: 128}
-		queryParts = cmd.StringsArg("EMOJI", []string{"face", "joy"}, "")
-		substring  = cmd.BoolOpt("sub", true, "match *EMOJI*")
-		overlay    = cmd.BoolOpt("o overlay", false, "read images from stdin (instead of just creating one)")
+		alpha =  gifcmd.Float{Value:1.0}
+		queryParts = cmd.StringsArg("EMOJI", nil, "one or more glob expressions")
+		exact      = cmd.BoolOpt("e exact", false, "match the query exactly")
+		pipe    = cmd.BoolOpt("p pipe", false, "overlay the emoji over input images (instead of just creating one)")
 		list       = cmd.BoolOpt("l list-only", false, "just list matches")
 	)
-	cmd.VarOpt("s font-size", &size, "")
+	cmd.VarOpt("s size", &size, "")
+	cmd.VarOpt("a pipe-alpha", &alpha, "")
 	cmd.Action = func() {
-		if *overlay {
+		if *pipe {
 			ProcessInput()
 		}
 		queryBuffer := &bytes.Buffer{}
-		if *substring {
+		if !*exact {
 			queryBuffer.WriteRune('*')
 		}
 		for i, part := range *queryParts {
@@ -38,7 +40,7 @@ func CommandEmoji(cmd *cli.Cmd) {
 				queryBuffer.WriteRune('*')
 			}
 		}
-		if *substring {
+		if !*exact {
 			queryBuffer.WriteRune('*')
 		}
 		query := queryBuffer.String()
@@ -62,7 +64,7 @@ func CommandEmoji(cmd *cli.Cmd) {
 		}
 		emoji := matches[0]
 		log.Printf("picked %s (%s)", string(emoji.Runes), emoji.UnicodeNames)
-		Emoji(emoji, size.Value)
+		Emoji(emoji, size.Value, alpha.Value)
 	}
 }
 
@@ -75,14 +77,14 @@ func EmojiMatches(queryGlob glob.Glob) (matches []gifstatic.Emoji) {
 	return
 }
 
-func Emoji(emoji gifstatic.Emoji, size float64) {
+func Emoji(emoji gifstatic.Emoji, size, alpha float64) {
 	emojiImage := imaging.Resize(emoji.Image(), int(size), int(size), imaging.Lanczos)
 	if len(images) == 0 {
 		images = append(images, emojiImage)
 		return
 	}
 	write := func(i int) {
-		images[i] = imaging.OverlayCenter(images[0], emojiImage, 1.0)
+		images[i] = imaging.OverlayCenter(images[0], emojiImage, alpha)
 	}
 	parallel(len(images), write)
 }

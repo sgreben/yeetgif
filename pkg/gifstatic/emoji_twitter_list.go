@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"sort"
 	"strings"
 
 	"golang.org/x/text/unicode/runenames"
@@ -12,9 +13,10 @@ import (
 )
 
 type Emoji struct {
-	KeyName      string
-	Runes        []rune
-	UnicodeNames []string
+	KeyName            string
+	Runes              []rune
+	UnicodeNames       []string
+	UnicodeNamesJoined string
 }
 
 func (e Emoji) Image() image.Image {
@@ -38,6 +40,16 @@ func init() {
 			e.Runes = append(e.Runes, r)
 			e.UnicodeNames = append(e.UnicodeNames, strings.ToLower(runenames.Name(r)))
 		}
+		e.UnicodeNamesJoined = strings.Join(e.UnicodeNames, " ")
 		EmojiList = append(EmojiList, e)
 	}
+	sort.Slice(EmojiList, func(i, j int) bool {
+		if len(EmojiList[i].UnicodeNames) < len(EmojiList[j].UnicodeNames) {
+			return true
+		}
+		if len(EmojiList[i].UnicodeNamesJoined) < len(EmojiList[j].UnicodeNamesJoined) {
+			return true
+		}
+		return EmojiList[i].UnicodeNamesJoined < EmojiList[j].UnicodeNamesJoined
+	})
 }

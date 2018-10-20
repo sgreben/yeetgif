@@ -44,14 +44,14 @@ Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) fro
 
 ```sh
 # Linux
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.1/gif_1.16.1_linux_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.2/gif_1.16.2_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.1/gif_1.16.1_osx_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.2/gif_1.16.2_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.1/gif_1.16.1_windows_x86_64.zip
-unzip gif_1.16.1_windows_x86_64.zip
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.16.2/gif_1.16.2_windows_x86_64.zip
+unzip gif_1.16.2_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -63,10 +63,17 @@ brew install giflossy
 ## Use it
 
 ```sh
-<doc/yeet.png gif fried | gif wobble | gif crop >doc/yeet.gif
+<doc/yeet.png gif fried | gif wobble  >doc/yeet.gif
 ```
 ![before](doc/yeet.png)
 ![after](doc/yeet.gif)
+
+
+```sh
+gif emoji aubergine | gif wobble >doc/eggplant_wobble.gif
+```
+![before](doc/eggplant.png)
+![after](doc/eggplant_wobble.gif)
 
 
 ## Usage
@@ -426,15 +433,16 @@ Options:
 Usage: gif emoji [OPTIONS] EMOJI...
 
 ╰( ͡° ͜ʖ ͡° )つ──☆*🤔
-                    
-Arguments:          
-  EMOJI             (default ["face", "joy"])
-                    
-Options:            
-      --sub         match *EMOJI* (default true)
-  -o, --overlay     read images from stdin (instead of just creating one)
-  -l, --list-only   just list matches
-  -s, --font-size   (default 128)
+                     
+Arguments:           
+  EMOJI              one or more glob expressions
+                     
+Options:             
+  -e, --exact        match the query exactly
+  -p, --pipe         overlay the emoji over input images (instead of just creating one)
+  -l, --list-only    just list matches
+  -s, --size         (default 128)
+  -a, --pipe-alpha   (default 1)
 ```
 
 ### nop
