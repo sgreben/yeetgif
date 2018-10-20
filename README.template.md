@@ -7,6 +7,9 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
 <!-- TOC -->
 
 - [Get it](#get-it)
+    - [Alternative 1: `go get`](#alternative-1-go-get)
+    - [Alternative 2: just download the binary](#alternative-2-just-download-the-binary)
+    - [Alternative 3: docker](#alternative-3-docker)
 - [Use it](#use-it)
 - [Hall of Fame](#hall-of-fame)
 - [Usage](#usage)
@@ -36,11 +39,15 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
 
 ## Get it
 
+### Alternative 1: `go get`
+
 ```sh
 go get -u github.com/sgreben/yeetgif/cmd/gif
 ```
 
-Or [download the binary](https://github.com/sgreben/yeetgif/releases/latest) from the releases page.
+### Alternative 2: just download the binary
+
+Either from [the releases page](https://github.com/sgreben/yeetgif/releases/latest), or from the shell:
 
 ```sh
 # Linux
@@ -58,6 +65,19 @@ unzip gif_${VERSION}_windows_x86_64.zip
 
 ```sh
 brew install giflossy
+```
+
+You'll likely also want to have the binary in your `$PATH`. You can achieve this by adding this to your .bashrc (or .zshrc, ...):
+
+```sh
+export PATH=<directory-containing-the-gif-binary>:$PATH
+```
+
+### Alternative 3: docker
+
+```sh
+docker pull quay.io/sergey_grebenshchikov/yeetgif
+docker tag quay.io/sergey_grebenshchikov/yeetgif gif # (optional)
 ```
 
 ## Use it
