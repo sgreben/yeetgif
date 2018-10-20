@@ -31,6 +31,7 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [chop](#chop)
     - [text](#text)
     - [emoji](#emoji)
+    - [npc](#npc)
     - [nop](#nop)
     - [meta](#meta)
 - [Licensing](#licensing)
@@ -134,6 +135,7 @@ Commands:
   chop               ✂️( ͡°Ĺ̯ ͡° )🔪
   text               🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
   emoji              ╰( ͡° ͜ʖ ͡° )つ──☆*🤔
+  npc                ˙ ʟ ˙
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
@@ -468,6 +470,30 @@ Options:
   -l, --list-only    just list matches
   -s, --size         (default 128)
   -a, --pipe-alpha   (default 1)
+```
+
+### npc
+
+![before](doc/gunther-small.gif)![example](doc/npc.gif)
+
+```text
+
+Usage: gif npc [OPTIONS]
+
+˙ ʟ ˙
+                        
+Options:                
+  -x                    (default [0.5])
+  -y                    (default [0.5])
+  -s, --scale           (default [1])
+      --scale-x         (default [1])
+      --scale-y         (default [1])
+      --eye-scale       (default [1])
+      --nose-scale      (default [1])
+      --mouth-scale-x   (default [1])
+      --mouth-scale-y   (default [0])
+  -r, --angle           (default [0])
+  -a, --alpha           (default [1])
 ```
 
 ### nop

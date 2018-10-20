@@ -1,8 +1,22 @@
 package piecewiselinear
 
+import (
+	"math"
+)
+
 type Function struct {
 	X []float64
 	Y []float64
+}
+
+func (f *Function) SetDomain(min, max float64) {
+	n := len(f.Y)
+	f.X = make([]float64, n)
+	d := max - min
+	min, max = math.Min(max, min), math.Max(max, min)
+	for i := range f.Y {
+		f.X[i] = min + d*(float64(i)/float64(n-1))
+	}
 }
 
 func (f Function) At(x float64) float64 {
