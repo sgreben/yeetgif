@@ -2,7 +2,7 @@ package piecewiselinear
 
 import "testing"
 
-func TestFunction_Get(t *testing.T) {
+func TestFunction_At(t *testing.T) {
 	tests := []struct {
 		name string
 		X    []float64
@@ -52,8 +52,8 @@ func TestFunction_Get(t *testing.T) {
 				X: tt.X,
 				Y: tt.Y,
 			}
-			if got := f.Get(tt.x); got != tt.want {
-				t.Errorf("Function.Get() = %v, want %v", got, tt.want)
+			if got := f.At(tt.x); got != tt.want {
+				t.Errorf("Function.At() = %v, want %v", got, tt.want)
 			}
 		})
 	}

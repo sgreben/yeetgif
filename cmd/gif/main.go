@@ -118,7 +118,7 @@ func init() {
 	app.Command(commandChop, "✂️( ͡°Ĺ̯ ͡° )🔪", CommandChop)
 	app.Command(commandText, "🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️", CommandText)
 	app.Command(commandEmoji, "╰( ͡° ͜ʖ ͡° )つ──☆*🤔", CommandEmoji)
-	app.Command(commandNPC, "˙ ʟ ˙", CommandNPC)
+	app.Command(commandNPC, "•L•", CommandNPC)
 	app.Command(commandNop, "乁(ᴗ ͜ʖ ᴗ)ㄏ", func(cmd *cli.Cmd) { cmd.Action = func() {} })
 	app.Command(commandMeta, "(🧠 ͡ಠ ʖ̯ ͡ಠ)┌", CommandMeta)
 }

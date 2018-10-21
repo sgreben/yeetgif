@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/sgreben/yeetgif/pkg/floats"
 	"image"
 	"image/color"
 	"math"
@@ -79,12 +80,8 @@ func CommandWobble(cmd *cli.Cmd) {
 			x := w*stickyF.At(t) + (1-w)*s
 			return amplitude * x
 		}
-		customF := piecewiselinear.Function{}
-		k := float64(len(c.Values) - 1)
-		for i := 0; i < len(c.Values); i++ {
-			customF.X = append(customF.X, float64(i)/k)
-			customF.Y = append(customF.Y, float64((c.Values)[i]))
-		}
+		customF := piecewiselinear.Function{Y:c.Values}
+		customF.X = floats.MakeSpan(0, 1, len(customF.Y))
 		fs := map[string]func(float64) float64{
 			wobbleTypeSine:   sine,
 			wobbleTypeSaw:    saw,
