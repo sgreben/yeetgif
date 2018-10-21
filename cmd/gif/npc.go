@@ -170,8 +170,9 @@ func NPC(images []image.Image, bg, fg color.RGBA, fx, fy, fscale, fscalew, fscal
 		if blur {
 			sigma := 10.0
 			blurred := imaging.Crop(images[i], bNPC.Add(pos))
+			maskRotated := imaging.Rotate(mask, angle, color.Transparent)
 			blurred = imaging.Blur(blurred, sigma)
-			blurred = imaging.OverlayWithOp(blurred, mask, image.ZP, imaging.OpMinAlpha)
+			blurred = imaging.OverlayWithOp(blurred, maskRotated, image.ZP, imaging.OpMinAlpha)
 			images[i] = imaging.Overlay(images[i], blurred, pos, 1.0)
 		}
 		images[i] = imaging.Overlay(images[i], npcImage, pos, 1.0)
