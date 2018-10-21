@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"log"
+	"sort"
 	"strings"
 
 	"github.com/sgreben/yeetgif/pkg/imaging"
@@ -63,7 +64,7 @@ func CommandEmoji(cmd *cli.Cmd) {
 			return
 		}
 		emoji := matches[0]
-		log.Printf("picked %s (%s)", string(emoji.Runes), emoji.UnicodeNames)
+		log.Printf("picked %s %s", string(emoji.Runes), emoji.UnicodeNames)
 		Emoji(emoji, size.Value, alpha.Value)
 	}
 }
@@ -74,6 +75,16 @@ func EmojiMatches(queryGlob glob.Glob) (matches []gifstatic.Emoji) {
 			matches = append(matches, e)
 		}
 	}
+
+	sort.Slice(matches, func(i, j int) bool {
+		if len(matches[i].UnicodeNamesJoined) < len(matches[j].UnicodeNamesJoined) {
+			return true
+		}
+		if len(matches[i].UnicodeNamesJoined) > len(matches[j].UnicodeNamesJoined) {
+			return false
+		}
+		return matches[i].UnicodeNamesJoined < matches[j].UnicodeNamesJoined
+	})
 	return
 }
 

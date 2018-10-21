@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	"sort"
 	"strings"
 
 	"golang.org/x/text/unicode/runenames"
@@ -43,13 +42,4 @@ func init() {
 		e.UnicodeNamesJoined = strings.Join(e.UnicodeNames, " ")
 		EmojiList = append(EmojiList, e)
 	}
-	sort.Slice(EmojiList, func(i, j int) bool {
-		if len(EmojiList[i].UnicodeNames) < len(EmojiList[j].UnicodeNames) {
-			return true
-		}
-		if len(EmojiList[i].UnicodeNamesJoined) < len(EmojiList[j].UnicodeNamesJoined) {
-			return true
-		}
-		return EmojiList[i].UnicodeNamesJoined < EmojiList[j].UnicodeNamesJoined
-	})
 }
