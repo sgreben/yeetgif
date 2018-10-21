@@ -58,7 +58,7 @@ curl -L https://github.com/sgreben/yeetgif/releases/download/${VERSION}/gif_${VE
 curl -L https://github.com/sgreben/yeetgif/releases/download/${VERSION}/gif_${VERSION}_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -L https://github.com/sgreben/yeetgif/releases/download/${VERSION}/gif_${VERSION}_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/${VERSION}/gif_${VERSION}_windows_x86_64.zip
 unzip gif_${VERSION}_windows_x86_64.zip
 ```
 
