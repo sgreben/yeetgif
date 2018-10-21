@@ -52,14 +52,14 @@ Either from [the releases page](https://github.com/sgreben/yeetgif/releases/late
 
 ```sh
 # Linux
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.2/gif_1.18.2_linux_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.3/gif_1.18.3_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.2/gif_1.18.2_osx_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.3/gif_1.18.3_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.18.2/gif_1.18.2_windows_x86_64.zip
-unzip gif_1.18.2_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.18.3/gif_1.18.3_windows_x86_64.zip
+unzip gif_1.18.3_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
@@ -135,7 +135,7 @@ Commands:
   chop               ✂️( ͡°Ĺ̯ ͡° )🔪
   text               🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
   emoji              ╰( ͡° ͜ʖ ͡° )つ──☆*🤔
-  npc                ˙ ʟ ˙
+  npc                •L•
   nop                乁(ᴗ ͜ʖ ᴗ)ㄏ
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
                      
@@ -199,14 +199,17 @@ Options:
 
 ```text
 
-Usage: gif zoom [OPTIONS]
+Usage: gif zoom [OPTIONS] [ZOOM_LEVELS_CSV]
 
 (⌐▀͡ ̯ʖ▀)
-                 
-Options:         
-  -0, --from     (default 1)
-  -1, --to       (default 1.5)
-  -c, --custom   (default [])
+                    
+Arguments:          
+  ZOOM_LEVELS_CSV   e.g. 1.0,1.5 to zoom from 100% to 150% (default [])
+  c custom          (deprecated) (default [])
+                    
+Options:            
+  -0, --from        (deprecated) (default 1)
+  -1, --to          (deprecated) (default 1.5)
 ```
 
 ### shake
@@ -222,7 +225,7 @@ Usage: gif shake [OPTIONS]
 Options:            
   -f, --frequency   (default [1])
   -a, --amplitude   (default [7])
-  -r, --random      🌀 (default 0.75)
+  -r, --random      🌀 (default [0.75])
 ```
 
 ### woke
@@ -265,16 +268,16 @@ Options:
   -j, --jpeg         [0,100] (default 84)
   -w, --walk         🌀 (default 10)
   -i, --iterations   (default 1)
-  -a                 🅰️ (default 0.33)
-  -b                 🅱️ (default 0.2)
-  -c                 🆑 (default 0.9)
-  -n, --noise        🌀️ (default 1)
-      --noise1       🌀️ (default 0.02)
-      --noise2       🌀️ (default 0.5)
-      --noise3       🌀 (default 0.1)
-  -u, --saturation   (default 3)
-  -o, --contrast     (default 6)
-  -t, --tint         tint (default 0.4)
+  -a                 🅰️ (default [0.33])
+  -b                 🅱️ (default [0.2])
+  -c                 🆑 (default [0.9])
+  -n, --noise        🌀️ (default [1])
+      --noise1       🌀️ (default [0.02])
+      --noise2       🌀️ (default [0.5])
+      --noise3       🌀 (default [0.1])
+  -u, --saturation   (default [3])
+  -o, --contrast     (default [6])
+  -t, --tint         tint (default [0.4])
 ```
 
 ### hue
@@ -363,11 +366,11 @@ Arguments:
   INPUT            
                    
 Options:           
-  -x               (default 0)
-  -y               (default 0)
+  -x               (default [0])
+  -y               (default [0])
   -z, --z-order    one of [under over] (default over)
   -p, --position   one of [center left right top bottom abs] (default center)
-  -s, --scale      (default 1)
+  -s, --scale      (default [1])
 ```
 
 ### crowd
@@ -468,8 +471,8 @@ Options:
   -e, --exact        match the query exactly
   -p, --pipe         overlay the emoji over input images (instead of just creating one)
   -l, --list-only    just list matches
-  -s, --size         (default 128)
-  -a, --pipe-alpha   (default 1)
+  -s, --size         (default [128])
+  -a, --pipe-alpha   (default [1])
 ```
 
 ### npc
@@ -480,7 +483,7 @@ Options:
 
 Usage: gif npc [OPTIONS]
 
-˙ ʟ ˙
+•L•
                         
 Options:                
   -x                    (default [0.5])
