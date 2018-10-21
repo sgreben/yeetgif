@@ -44,6 +44,12 @@
   version = "v2.6.0"
 
 [[projects]]
+  name = "github.com/sgreben/piecewiselinear"
+  packages = ["."]
+  revision = "8144b95e616ba79ffcaf2ebb7018695ac8a169e8"
+  version = "1.0.1"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/image"
   packages = ["bmp","draw","font","font/basicfont","font/plan9font","math/f64","math/fixed","tiff","tiff/lzw"]
@@ -58,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e69a32d8f9ffa052fe1d3858943359c9368d4f0e1d06cd8e8e5bdb23252eafac"
+  inputs-digest = "fdd1da13163ef4f98ab2f3e1abd588362d089e494e4f7400ffb957bd1e94b51d"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -8,8 +8,7 @@ import (
 
 	"github.com/fogleman/gg"
 
-	"github.com/sgreben/yeetgif/pkg/floats"
-	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
+	"github.com/sgreben/piecewiselinear"
 
 	cli "github.com/jawher/mow.cli"
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
@@ -52,27 +51,27 @@ func CommandNPC(cmd *cli.Cmd) {
 		npcGrey := color.RGBA{R: 0xA3, G: 0xA3, B: 0xA3, A: 0xFF}
 		npcBlack := color.RGBA{R: 0x05, G: 0x05, B: 0x05, A: 0xFF}
 		fx := piecewiselinear.Function{Y: x.Values}
-		fx.X = floats.MakeSpan(0, 1, len(fx.Y))
+		fx.X = piecewiselinear.Span(0, 1, len(fx.Y))
 		fy := piecewiselinear.Function{Y: y.Values}
-		fy.X = floats.MakeSpan(0, 1, len(fy.Y))
+		fy.X = piecewiselinear.Span(0, 1, len(fy.Y))
 		fscale := piecewiselinear.Function{Y: scale.Values}
-		fscale.X = floats.MakeSpan(0, 1, len(fscale.Y))
+		fscale.X = piecewiselinear.Span(0, 1, len(fscale.Y))
 		fscaleW := piecewiselinear.Function{Y: scaleW.Values}
-		fscaleW.X = floats.MakeSpan(0, 1, len(fscaleW.Y))
+		fscaleW.X = piecewiselinear.Span(0, 1, len(fscaleW.Y))
 		fscaleH := piecewiselinear.Function{Y: scaleH.Values}
-		fscaleH.X = floats.MakeSpan(0, 1, len(fscaleH.Y))
+		fscaleH.X = piecewiselinear.Span(0, 1, len(fscaleH.Y))
 		feyeScale := piecewiselinear.Function{Y: eyeScale.Values}
-		feyeScale.X = floats.MakeSpan(0, 1, len(feyeScale.Y))
+		feyeScale.X = piecewiselinear.Span(0, 1, len(feyeScale.Y))
 		fnoseScale := piecewiselinear.Function{Y: noseScale.Values}
-		fnoseScale.X = floats.MakeSpan(0, 1, len(fnoseScale.Y))
+		fnoseScale.X = piecewiselinear.Span(0, 1, len(fnoseScale.Y))
 		fmouthScaleW := piecewiselinear.Function{Y: mouthScaleW.Values}
-		fmouthScaleW.X = floats.MakeSpan(0, 1, len(fmouthScaleW.Y))
+		fmouthScaleW.X = piecewiselinear.Span(0, 1, len(fmouthScaleW.Y))
 		fmouthScaleH := piecewiselinear.Function{Y: mouthScaleH.Values}
-		fmouthScaleH.X = floats.MakeSpan(0, 1, len(fmouthScaleH.Y))
+		fmouthScaleH.X = piecewiselinear.Span(0, 1, len(fmouthScaleH.Y))
 		fangle := piecewiselinear.Function{Y: angle.Values}
-		fangle.X = floats.MakeSpan(0, 1, len(fangle.Y))
+		fangle.X = piecewiselinear.Span(0, 1, len(fangle.Y))
 		falpha := piecewiselinear.Function{Y: alpha.Values}
-		falpha.X = floats.MakeSpan(0, 1, len(falpha.Y))
+		falpha.X = piecewiselinear.Span(0, 1, len(falpha.Y))
 		NPC(images, npcGrey, npcBlack, fx.At, fy.At, fscale.At, fscaleW.At, fscaleH.At, fangle.At, falpha.At, feyeScale.At, fnoseScale.At, fmouthScaleW.At, fmouthScaleH.At, bgtype.Value == bgBlur)
 	}
 }

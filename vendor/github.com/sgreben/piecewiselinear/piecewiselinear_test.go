@@ -1,6 +1,23 @@
 package piecewiselinear
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+func Example() {
+	f := Function{Y: []float64{0, 1, 0}} // "hat" function
+	f.X = Span(0, 1, len(f.Y))
+	fmt.Println(
+		f.At(0),
+		f.At(0.25),
+		f.At(0.5),
+		f.At(0.75),
+		f.At(1.0),
+	)
+	// Output:
+	// 0 0.5 1 0.5 0
+}
 
 func TestFunction_At(t *testing.T) {
 	tests := []struct {

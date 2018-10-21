@@ -3,8 +3,7 @@ package main
 import (
 	"image"
 
-	"github.com/sgreben/yeetgif/pkg/floats"
-	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
+	"github.com/sgreben/piecewiselinear"
 
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
 
@@ -29,7 +28,7 @@ func CommandZoom(cmd *cli.Cmd) {
 		switch {
 		case len(c.Texts) > 0:
 			customF := piecewiselinear.Function{Y: c.Values}
-			customF.X = floats.MakeSpan(0, 1, len(customF.Y))
+			customF.X = piecewiselinear.Span(0, 1, len(customF.Y))
 			f = customF.At
 		default:
 			f = func(t float64) float64 {

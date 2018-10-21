@@ -5,8 +5,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/sgreben/yeetgif/pkg/floats"
-	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
+	"github.com/sgreben/piecewiselinear"
 
 	cli "github.com/jawher/mow.cli"
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
@@ -26,11 +25,11 @@ func CommandShake(cmd *cli.Cmd) {
 	cmd.VarOpt("r random", &random, "🌀")
 	cmd.Action = func() {
 		randomF := piecewiselinear.Function{Y: random.Values}
-		randomF.X = floats.MakeSpan(0, 1, len(randomF.Y))
+		randomF.X = piecewiselinear.Span(0, 1, len(randomF.Y))
 		amplitudeF := piecewiselinear.Function{Y: a.Values}
-		amplitudeF.X = floats.MakeSpan(0, 1, len(amplitudeF.Y))
+		amplitudeF.X = piecewiselinear.Span(0, 1, len(amplitudeF.Y))
 		frequencyF := piecewiselinear.Function{Y: f.Values}
-		frequencyF.X = floats.MakeSpan(0, 1, len(frequencyF.Y))
+		frequencyF.X = piecewiselinear.Span(0, 1, len(frequencyF.Y))
 		Shake(images, randomF.At, frequencyF.At, amplitudeF.At)
 	}
 }

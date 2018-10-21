@@ -1,10 +1,12 @@
 package piecewiselinear
 
+// Function is a piecewise-linear 1-dimensional function
 type Function struct {
 	X []float64
 	Y []float64
 }
 
+// At returns the function's value at the given point
 func (f Function) At(x float64) float64 {
 	X, Y := f.X, f.Y
 	i, j := 0, len(X)

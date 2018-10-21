@@ -5,8 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sgreben/yeetgif/pkg/floats"
-	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
+	"github.com/sgreben/piecewiselinear"
 )
 
 // Float is a `flag.Value` for a float argument.
@@ -49,7 +48,7 @@ func (fv *FloatsCSV) Help() string {
 
 func (fv *FloatsCSV) PiecewiseLinear(min, max float64) func(float64) float64 {
 	f := piecewiselinear.Function{Y: fv.Values}
-	f.X = floats.MakeSpan(min, max, len(f.Y))
+	f.X = piecewiselinear.Span(min, max, len(f.Y))
 	return f.At
 }
 
