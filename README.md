@@ -52,14 +52,14 @@ Either from [the releases page](https://github.com/sgreben/yeetgif/releases/late
 
 ```sh
 # Linux
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.3/gif_1.18.3_linux_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.4/gif_1.18.4_linux_x86_64.tar.gz | tar xz
 
 # OS X
-curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.3/gif_1.18.3_osx_x86_64.tar.gz | tar xz
+curl -L https://github.com/sgreben/yeetgif/releases/download/1.18.4/gif_1.18.4_osx_x86_64.tar.gz | tar xz
 
 # Windows
-curl -LO https://github.com/sgreben/yeetgif/releases/download/1.18.3/gif_1.18.3_windows_x86_64.zip
-unzip gif_1.18.3_windows_x86_64.zip
+curl -LO https://github.com/sgreben/yeetgif/releases/download/1.18.4/gif_1.18.4_windows_x86_64.zip
+unzip gif_1.18.4_windows_x86_64.zip
 ```
 
 **NOTE**: To use the `optimize` command, you'll also need the [`giflossy`](https://github.com/kornelski/giflossy) fork of `gifsicle` installed:
