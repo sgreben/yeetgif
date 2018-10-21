@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/sgreben/yeetgif/pkg/floats"
+	"github.com/sgreben/yeetgif/pkg/piecewiselinear"
 )
 
 // Float is a `flag.Value` for a float argument.
@@ -42,6 +45,12 @@ type FloatsCSV struct {
 // Help returns a string suitable for inclusion in a flag help message.
 func (fv *FloatsCSV) Help() string {
 	return fmt.Sprintf("comma-separated list of 64-bit floats")
+}
+
+func (fv *FloatsCSV) PiecewiseLinear(min, max float64) func(float64) float64 {
+	f := piecewiselinear.Function{Y: fv.Values}
+	f.X = floats.MakeSpan(min, max, len(f.Y))
+	return f.At
 }
 
 // Set is flag.Value.Set

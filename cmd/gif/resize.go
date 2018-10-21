@@ -39,6 +39,18 @@ func ResizeScale(images []image.Image, scale float64) {
 	parallel(len(images), resize)
 }
 
+// ResizeScaleF resizes by a factor
+func ResizeScaleF(images []image.Image, scaleF func(float64) float64) {
+	n := float64(len(images))
+	resize := func(i int) {
+		b := images[i].Bounds()
+		width, height := float64(b.Dx()), float64(b.Dy())
+		scale := scaleF(float64(i) / n)
+		images[i] = imaging.Resize(images[i], int(width*scale), int(height*scale), imaging.Lanczos)
+	}
+	parallel(len(images), resize)
+}
+
 // ResizeTarget resizes to fit in the given bounds
 func ResizeTarget(images []image.Image, width, height float64) {
 	resize := func(i int) {

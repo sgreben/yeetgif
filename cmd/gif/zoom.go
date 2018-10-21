@@ -14,15 +14,16 @@ import (
 
 func CommandZoom(cmd *cli.Cmd) {
 	cmd.Before = ProcessInput
-	cmd.Spec = "[OPTIONS]"
+	cmd.Spec = "[OPTIONS] [ZOOM_LEVELS_CSV]"
 	var (
 		from = gifcmd.Float{Value: 1.0}
 		to   = gifcmd.Float{Value: 1.5}
 		c    = gifcmd.FloatsCSV{}
 	)
-	cmd.VarOpt("0 from", &from, "")
-	cmd.VarOpt("1 to", &to, "")
-	cmd.VarOpt("c custom", &c, "")
+	cmd.VarArg("ZOOM_LEVELS_CSV", &c, "e.g. 1.0,1.5 to zoom from 100% to 150%")
+	cmd.VarOpt("0 from", &from, "(deprecated)")
+	cmd.VarOpt("1 to", &to, "(deprecated)")
+	cmd.VarArg("c custom", &c, "(deprecated)")
 	cmd.Action = func() {
 		var f func(float64) float64
 		switch {

@@ -18,8 +18,8 @@ import (
 func CommandEmoji(cmd *cli.Cmd) {
 	cmd.Spec = "[OPTIONS] EMOJI..."
 	var (
-		size       = gifcmd.Float{Value: 128}
-		alpha      = gifcmd.Float{Value: 1.0}
+		size       = gifcmd.FloatsCSV{Values: []float64{128}}
+		alpha      = gifcmd.FloatsCSV{Values: []float64{1.0}}
 		queryParts = cmd.StringsArg("EMOJI", nil, "one or more glob expressions")
 		exact      = cmd.BoolOpt("e exact", false, "match the query exactly")
 		pipe       = cmd.BoolOpt("p pipe", false, "overlay the emoji over input images (instead of just creating one)")
@@ -65,7 +65,7 @@ func CommandEmoji(cmd *cli.Cmd) {
 		}
 		emoji := matches[0]
 		log.Printf("picked %s %s", string(emoji.Runes), emoji.UnicodeNames)
-		Emoji(emoji, size.Value, alpha.Value)
+		Emoji(emoji, size.PiecewiseLinear(0, 1), alpha.PiecewiseLinear(0, 1))
 	}
 }
 
@@ -88,14 +88,22 @@ func EmojiMatches(queryGlob glob.Glob) (matches []gifstatic.Emoji) {
 	return
 }
 
-func Emoji(emoji gifstatic.Emoji, size, alpha float64) {
-	emojiImage := imaging.Resize(emoji.Image(), int(size), int(size), imaging.Lanczos)
+func Emoji(emoji gifstatic.Emoji, sizeF, alphaF func(float64)float64) {
+	size0 := sizeF(0)
+	emojiImage := imaging.Resize(emoji.Image(), int(size0), int(size0), imaging.Lanczos)
 	if len(images) == 0 {
 		images = append(images, emojiImage)
 		return
 	}
+	n := float64(len(images))
 	write := func(i int) {
-		images[i] = imaging.OverlayCenter(images[0], emojiImage, alpha)
+		t := float64(i)/n
+		size := sizeF(t)
+		if size0 != size {
+			emojiImage = imaging.Resize(emoji.Image(), int(size), int(size), imaging.Lanczos)
+		}
+		alpha := alphaF(t)
+		images[i] = imaging.OverlayCenter(images[i], emojiImage, alpha)
 	}
 	parallel(len(images), write)
 }
