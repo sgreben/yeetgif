@@ -64,14 +64,13 @@ func CommandWoke(cmd *cli.Cmd) {
 		alphaT := at.Value
 		alphaP := ap.Value
 		alphaV := alpha.Value
-		flare = imaging.AdjustHSLAFunc(flare, func(_, _ int, h, s, l, a *float64) {
+		flare = imaging.AdjustHSLAFunc(flare, func(_, _ int, h, s, l, a *float64, _ *int) {
 			*a = math.Pow(*a, alphaP) * alphaV
 			if *a < alphaT {
 				*a = 0
 				return
-			} else {
-				*a = (*a - alphaT) / (1.0 - alphaT)
 			}
+			*a = (*a - alphaT) / (1.0 - alphaT)
 			*l = (*l) * lightness.Value
 			if changeHue {
 				*h += hue.Value

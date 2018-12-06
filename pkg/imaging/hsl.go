@@ -5,14 +5,36 @@ import (
 	"math"
 )
 
-func HSLA(c color.RGBA) (h, s, l, a float64) {
-	r := float64(c.R) / 255.0
-	g := float64(c.G) / 255.0
-	b := float64(c.B) / 255.0
-	a = float64(c.A) / 255.0
+var byteToFloat [256]float64
 
-	max := math.Max(math.Max(r, g), b)
-	min := math.Min(math.Min(r, g), b)
+func init() {
+	for i := 0; i <= 0xFF; i++ {
+		byteToFloat[i] = float64(i) / 0xFF
+	}
+}
+
+func HSLA(c color.RGBA) (h, s, l, a float64) {
+	r := byteToFloat[c.R]
+	g := byteToFloat[c.G]
+	b := byteToFloat[c.B]
+	a = byteToFloat[c.A]
+
+	maxByte := c.R
+	if c.G > maxByte {
+		maxByte = c.G
+	}
+	if c.B > maxByte {
+		maxByte = c.B
+	}
+	max := byteToFloat[maxByte]
+	minByte := c.R
+	if c.G < minByte {
+		minByte = c.G
+	}
+	if c.B < minByte {
+		minByte = c.B
+	}
+	min := byteToFloat[minByte]
 	l = (max + min) / 2
 	delta := max - min
 	if delta != 0 {
@@ -50,8 +72,18 @@ func RGBA(h, s, l, a float64) (c color.RGBA) {
 	case h > 1:
 		h = h - math.Floor(h)
 	}
-	s = math.Max(0, math.Min(s, 1))
-	l = math.Max(0, math.Min(l, 1))
+	switch {
+	case s < 0:
+		s = 0
+	case s > 1:
+		s = 1
+	}
+	switch {
+	case l < 0:
+		l = 0
+	case l > 1:
+		l = 1
+	}
 	c.A = uint8(255 * a)
 	if s == 0 {
 		c.R = uint8(255 * l)

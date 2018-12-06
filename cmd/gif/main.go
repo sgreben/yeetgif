@@ -84,6 +84,8 @@ var (
 )
 
 func main() {
+	startProfile()
+	defer stopProfile()
 	app.VarOpt("d delay-ms", &delay, "Frame delay in milliseconds")
 	app.Before = func() {
 		config.Raw = *raw

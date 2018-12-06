@@ -117,19 +117,25 @@ func AdjustGamma(img image.Image, gamma float64) *image.NRGBA {
 	return adjustLUT(img, lut)
 }
 
+func randomFloat32Signed(seed *int) float32 {
+	*seed *= 16807
+	return math.Float32frombits((uint32(*seed)>>9)|0x40000000) - 3.0
+}
+
 func AdjustNoiseHSL(img image.Image, hn, sn, ln float64) *image.NRGBA {
 	src := newScanner(img)
 	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
 	parallel(0, src.h, func(ys <-chan int) {
+		seed := rand.Int()
 		for y := range ys {
 			i := y * dst.Stride
 			src.scan(0, y, src.w, y+1, dst.Pix[i:i+src.w*4])
 			for x := 0; x < src.w; x++ {
 				r, g, b := dst.Pix[i+0], dst.Pix[i+1], dst.Pix[i+2]
 				h, s, l, _ := HSLA(color.RGBA{R: r, G: g, B: b})
-				h += hn * (2*rand.Float64() - 1)
-				s += sn * (2*rand.Float64() - 1)
-				l += ln * (2*rand.Float64() - 1)
+				h += hn * float64(randomFloat32Signed(&seed))
+				s += sn * float64(randomFloat32Signed(&seed))
+				l += ln * float64(randomFloat32Signed(&seed))
 				c := RGBA(h, s, l, 0)
 				dst.Pix[i+0] = c.R
 				dst.Pix[i+1] = c.G
@@ -243,17 +249,18 @@ func AdjustHSL(img image.Image, weight float64, h, s, l float64) *image.NRGBA {
 	return dst
 }
 
-func AdjustHSLAFunc(img image.Image, f func(x, y int, h, s, l, a *float64)) *image.NRGBA {
+func AdjustHSLAFunc(img image.Image, f func(x, y int, h, s, l, a *float64, seed *int)) *image.NRGBA {
 	src := newScanner(img)
 	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
 	parallel(0, src.h, func(ys <-chan int) {
+		seed := rand.Int()
 		for y := range ys {
 			i := y * dst.Stride
 			src.scan(0, y, src.w, y+1, dst.Pix[i:i+src.w*4])
 			for x := 0; x < src.w; x++ {
 				r, g, b, a0 := dst.Pix[i+0], dst.Pix[i+1], dst.Pix[i+2], dst.Pix[i+3]
 				h, s, l, a := HSLA(color.RGBA{R: r, G: g, B: b, A: a0})
-				f(x, y, &h, &s, &l, &a)
+				f(x, y, &h, &s, &l, &a, &seed)
 				c := RGBA(h, s, l, a)
 				dst.Pix[i+0] = c.R
 				dst.Pix[i+1] = c.G

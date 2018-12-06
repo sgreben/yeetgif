@@ -2,7 +2,8 @@ package main
 
 import (
 	"image"
-	"math/rand"
+
+	"github.com/sgreben/yeetgif/pkg/gifmath"
 
 	cli "github.com/jawher/mow.cli"
 	"github.com/sgreben/yeetgif/pkg/gifcmd"
@@ -32,10 +33,10 @@ func Noise(images []image.Image, noiseF, noise1F, noise2F, noise3F func(float64)
 	noise := func(i int) {
 		t := float64(i) / n
 		noise, noise1, noise2, noise3 := noiseF(t), noise1F(t), noise2F(t), noise3F(t)
-		images[i] = imaging.AdjustHSLAFunc(images[i], func(x, y int, h, s, l, a *float64) {
-			*h = *h + noise*noise1*rand.Float64()
-			*s = *s + noise*noise2*rand.Float64()
-			*l = *l + noise*noise3*rand.Float64()
+		images[i] = imaging.AdjustHSLAFunc(images[i], func(x, y int, h, s, l, a *float64, seed *int) {
+			*h = *h + noise*noise1*float64(gifmath.RandomFloat32Signed(seed))
+			*s = *s + noise*noise2*float64(gifmath.RandomFloat32Signed(seed))
+			*l = *l + noise*noise3*float64(gifmath.RandomFloat32Signed(seed))
 		})
 	}
 	parallel(len(images), noise, "noise")

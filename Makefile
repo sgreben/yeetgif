@@ -3,7 +3,7 @@
 APP=gif
 NAME := yeetgif
 REPOSITORY := quay.io/sergey_grebenshchikov/$(NAME)
-VERSION := 1.23.4
+VERSION := 1.23.5
 VERSION_COMMIT := $(VERSION)-$(shell printf "%s" "$$(git rev-parse HEAD)" | cut -c 1-8)
 
 PACKAGES := $(shell go list -f {{.Dir}} ./...)
@@ -48,7 +48,7 @@ doc/roll.gif:
 	<doc/eggplant.png gif roll > doc/roll.gif
 
 doc/wobble.gif:
-	<doc/eggplant.png gif -n 30 wobble -a 10 -f 2 > doc/wobble.gif
+	gif -r emoji -s 128 eggplant | gif -n 30 wobble -a 10 -f 2 > doc/wobble.gif
 
 doc/rain.gif:
 	gif -r emoji -s 64 aubergine | gif -r rain | gif optimize -n --kb=999 > doc/rain.gif

@@ -65,7 +65,7 @@ func Scan(images []image.Image, f func(x, y, t float64, h, s, l, a *float64)) {
 		b := images[i].Bounds()
 		bw := float64(b.Dx())
 		bh := float64(b.Dy())
-		images[i] = imaging.AdjustHSLAFunc(images[i], func(x, y int, h, s, l, a *float64) {
+		images[i] = imaging.AdjustHSLAFunc(images[i], func(x, y int, h, s, l, a *float64, _ *int) {
 			xf := float64(x-b.Min.X) / bw
 			yf := float64(y-b.Min.Y) / bh
 			f(xf, yf, t, h, s, l, a)
