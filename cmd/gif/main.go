@@ -53,7 +53,6 @@ const (
 	commandHue      = "hue"
 	commandMeta     = "meta"
 	commandNoise    = "noise"
-	commandNPC      = "npc"
 	commandOptimize = "optimize"
 	commandPulse    = "pulse"
 	commandRain     = "rain"
@@ -129,7 +128,6 @@ func init() {
 	app.Command(commandChop, "✂️( ͡°Ĺ̯ ͡° )🔪", CommandChop)
 	app.Command(commandText, "🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️", CommandText)
 	app.Command(commandEmoji, "╰( ͡° ͜ʖ ͡° )つ──☆*🤔", CommandEmoji)
-	app.Command(commandNPC, "•L•", CommandNPC)
 	app.Command(commandRain, "。°。°( ͡° ͜ʖ ͡ °)°。°。°", CommandRain)
 	app.Command(commandScan, "( ͡ ⿳ ͜ʖ ͡ ⿳ )", CommandScan)
 	app.Command(commandNoise, "·͙*̩̩͙˚̩̥̩̥( ͡▓▒ ͜ʖ ͡█░ )*̩̩͙:͙", CommandNoise)

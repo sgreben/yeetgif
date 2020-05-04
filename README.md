@@ -30,7 +30,6 @@ Composable GIF effects CLI, with reasonable defaults. Made for custom Slack/Disc
     - [chop](#chop)
     - [text](#text)
     - [emoji](#emoji)
-    - [npc](#npc)
     - [rain](#rain)
     - [cat](#cat)
     - [meta](#meta)
@@ -112,16 +111,16 @@ Post a GIF made using yeetgif with either the
 
 Usage: gif [OPTIONS] COMMAND [arg...]
 
-                     
-Options:             
+
+Options:
   -n                 Duplicate a single input image this many times (default 30)
   -q, --quiet        Disable all log output (stderr)
   -p, --pad          Pad images (default true)
       --write-meta   Write command line options into output GIF metadata (default true)
   -r, --raw          Raw (lossless, *not* GIF) image output, for re-piping to yeetgif
   -d, --delay-ms     Frame delay in milliseconds (default [25])
-                     
-Commands:            
+
+Commands:
   roll               (☭ ͜ʖ ☭)
   wobble             🍆( ͡° ͜ʖ ͡°)🍆
   pulse              ( ͡◉ ͜ʖ ͡◉)
@@ -140,13 +139,12 @@ Commands:
   chop               ✂️( ͡°Ĺ̯ ͡° )🔪
   text               🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
   emoji              ╰( ͡° ͜ʖ ͡° )つ──☆*🤔
-  npc                •L•
   rain               。°。°( ͡° ͜ʖ ͡ °)°。°。°
   scan               ( ͡ ⿳ ͜ʖ ͡ ⿳ )
   noise              ·͙*̩̩͙˚̩̥̩̥( ͡▓▒ ͜ʖ ͡█░ )*̩̩͙:͙
   cat                /ᐠ｡ꞈ｡ᐟ\
   meta               (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
-                     
+
 Run 'gif COMMAND --help' for more information on a command.
 ```
 
@@ -167,8 +165,8 @@ Run 'gif COMMAND --help' for more information on a command.
 Usage: gif roll [OPTIONS]
 
 (☭ ͜ʖ ☭)
-                      
-Options:              
+
+Options:
   -r, --revolutions   (default 1)
   -s, --scale         (default 1)
   -p, --phase         (default 0)
@@ -184,11 +182,11 @@ Options:
 Usage: gif wobble [OPTIONS] [CUSTOM]
 
 🍆( ͡° ͜ʖ ͡°)🍆
-                    
-Arguments:          
+
+Arguments:
   CUSTOM            comma-separated angles (°), e.g. 0,10,0,60,0 (default [])
-                    
-Options:            
+
+Options:
   -f, --frequency   (default 1)
   -a, --amplitude   (default 20)
   -p, --phase       (default 0)
@@ -205,11 +203,11 @@ Options:
 Usage: gif pulse [OPTIONS] [ZOOM_LEVELS_CSV]
 
 ( ͡◉ ͜ʖ ͡◉)
-                    
-Arguments:          
+
+Arguments:
   ZOOM_LEVELS_CSV   (default [])
-                    
-Options:            
+
+Options:
   -0, --from        (default 0.9)
   -1, --to          (default 1)
   -f, --frequency   (default 1)
@@ -225,8 +223,8 @@ Options:
 Usage: gif zoom [OPTIONS] [ZOOM_LEVELS_CSV]
 
 (⌐▀͡ ̯ʖ▀)
-                    
-Arguments:          
+
+Arguments:
   ZOOM_LEVELS_CSV   e.g. 1.0,1.5 to zoom from 100% to 150% (default [])
 ```
 
@@ -239,8 +237,8 @@ Arguments:
 Usage: gif shake [OPTIONS]
 
 ˵(˵ ͡⚆ ͜ʖ ͡⚆˵)˵
-                    
-Options:            
+
+Options:
   -f, --frequency   (default [1])
   -a, --amplitude   (default [7])
   -r, --random      🌀 (default [0.75])
@@ -255,11 +253,11 @@ Options:
 Usage: gif woke [OPTIONS] POINTS
 
 💯  W O K E F L A R E S ( ͡ 🅱️ ͜ʖ ͡ 🅱️ ) 💯
-                          
-Arguments:                
+
+Arguments:
   POINTS                  flare locations, JSON, e.g. "[[123,456],[-100,23]]" (default &[])
-                          
-Options:                  
+
+Options:
   -c, --clip              clip flares to image alpha (default true)
   -t, --type              (default full)
   -s, --scale             (default 0.9)
@@ -280,8 +278,8 @@ Options:
 Usage: gif fried [OPTIONS]
 
 fr͍͈i̗̟̲̻e͕̗d̬ m̷͔͊e̶̪̿m̷̙̈́é̵̤s̷̺͒
-                     
-Options:             
+
+Options:
       --clip         (default true)
   -w, --walk         🌀 (default 10)
   -i, --iterations   (default 1)
@@ -307,11 +305,11 @@ Options:
 Usage: gif hue [OPTIONS] [HUE_OFFSETS_CSV]
 
 ( ͡☆ ͜ʖ ͡☆)
-                    
-Arguments:          
+
+Arguments:
   HUE_OFFSETS_CSV   (default [])
-                    
-Options:            
+
+Options:
   -f, --frequency   (default 1)
   -a, --amplitude   (default 0.1)
   -x                (default [1])
@@ -328,11 +326,11 @@ Options:
 Usage: gif tint [OPTIONS] [TINT_HUE_CSV]
 
 🎨༼ຈل͜ຈ༽
-                    
-Arguments:          
+
+Arguments:
   TINT_HUE_CSV      (default [])
-                    
-Options:            
+
+Options:
   -f, --frequency   (default 1)
   -a, --amplitude   (default 0.95)
   -x                (default [1])
@@ -348,8 +346,8 @@ Options:
 Usage: gif resize [OPTIONS]
 
 (° ͜ʖ°)¯\_( ͡☉ ͜ʖ ͡☉)_/¯
-                 
-Options:         
+
+Options:
   -s, --scale    (default 1)
   -x, --width    width (pixels) (default 0)
   -y, --height   height (pixels) (default 0)
@@ -362,8 +360,8 @@ Options:
 Usage: gif crop [OPTIONS]
 
 ┬┴┬┴┤ ͜ʖ ͡°)
-                    
-Options:            
+
+Options:
   -t, --threshold   (default 0)
 ```
 
@@ -374,8 +372,8 @@ Options:
 Usage: gif optimize [OPTIONS]
 
 👌( ͡ᵔ ͜ʖ ͡ᵔ )👌
-                    
-Options:            
+
+Options:
       --kb          target file size (KB) (default 128)
   -n, --no-resize   don't resize the image
   -x, --width       target width (pixels) (default 0)
@@ -391,11 +389,11 @@ Options:
 Usage: gif compose [OPTIONS] INPUT
 
 (ﾉ ͡° ͜ʖ ͡°)ﾉ*:･ﾟ✧
-                   
-Arguments:         
-  INPUT            
-                   
-Options:           
+
+Arguments:
+  INPUT
+
+Options:
   -x               (default [0])
   -y               (default [0])
   -z, --z-order    one of [under over] (default over)
@@ -412,8 +410,8 @@ Options:
 Usage: gif crowd [OPTIONS]
 
 (⟃ ͜ʖ ⟄) ͜ʖ ͡°)( ° ͜ʖ( ° ͜ʖ °)
-                 
-Options:         
+
+Options:
   -n             crowd size (default 3)
       --flip     🌀 flip (default true)
   -x             🌀 x (default 0.5)
@@ -433,8 +431,8 @@ Options:
 Usage: gif erase [OPTIONS]
 
 ( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿
-                    
-Options:            
+
+Options:
   -x, --sample-x    (default 3)
   -y, --sample-y    (default 3)
   -t, --tolerance   (default 0.2)
@@ -450,13 +448,13 @@ Options:
 Usage: gif chop COMMAND [arg...]
 
 ✂️( ͡°Ĺ̯ ͡° )🔪
-                   
-Commands:          
-  shuffle          
-  dup, duplicate   
-  drop             
-  rev, reverse     
-                   
+
+Commands:
+  shuffle
+  dup, duplicate
+  drop
+  rev, reverse
+
 Run 'gif chop COMMAND --help' for more information on a command.
 ```
 
@@ -470,11 +468,11 @@ Run 'gif chop COMMAND --help' for more information on a command.
 Usage: gif text [OPTIONS] [TEXT]
 
 🅰️乁(˵ ͡☉ ͜ʖ ͡☉˵)┌🅱️
-                             
-Arguments:                   
+
+Arguments:
   TEXT                       (default "#yeetgif")
-                             
-Options:                     
+
+Options:
   -a, --background-alpha     (default 0.7)
   -s, --font-size            (default 18.5)
   -y, --text-y               (default 0.3)
@@ -491,42 +489,16 @@ Options:
 Usage: gif emoji [OPTIONS] EMOJI...
 
 ╰( ͡° ͜ʖ ͡° )つ──☆*🤔
-                     
-Arguments:           
+
+Arguments:
   EMOJI              one or more glob expressions
-                     
-Options:             
+
+Options:
   -e, --exact        match the query exactly
   -p, --pipe         overlay the emoji over input images (instead of just creating one)
   -l, --list-only    just list matches
   -s, --size         (default [128])
   -a, --pipe-alpha   (default [1])
-```
-
-### npc
-
-![before](doc/gunther-small.gif)![example](doc/npc.gif)![example](doc/npc-blur.gif)
-
-```text
-
-Usage: gif npc [OPTIONS]
-
-•L•
-                         
-Options:                 
-  -x                     (default [0.5])
-  -y                     (default [0.5])
-      --bg               one of [solid blur] (default solid)
-      --bg-blur-radius   (specifying this implies --bg=blur) (default 10)
-  -s, --scale            (default [1])
-      --scale-x          (default [1])
-      --scale-y          (default [1])
-      --eye-scale        (default [1])
-      --nose-scale       (default [1])
-      --mouth-scale-x    (default [1])
-      --mouth-scale-y    (default [0])
-  -r, --angle            (default [0])
-  -a, --alpha            (default [1])
 ```
 
 ### rain
@@ -548,11 +520,11 @@ Options:
 Usage: gif rain [OPTIONS] [INPUT...] [OPTIONS]
 
 。°。°( ͡° ͜ʖ ͡ °)°。°。°
-                                   
-Arguments:                         
-  INPUT                            
-                                   
-Options:                           
+
+Arguments:
+  INPUT
+
+Options:
   -d, --density                    (default 0.75)
   -b, --bounciness                 (default [0.3])
   -g, --gravity                    (default 900)
@@ -575,8 +547,8 @@ Options:
 Usage: gif cat [INPUT...]
 
 /ᐠ｡ꞈ｡ᐟ\
-               
-Arguments:     
+
+Arguments:
   INPUT        <filename>
 ```
 
@@ -609,12 +581,12 @@ $ <doc/yeet.gif gif meta show --raw
 Usage: gif meta COMMAND [arg...]
 
 (🧠 ͡ಠ ʖ̯ ͡ಠ)┌
-               
-Commands:      
+
+Commands:
   show         show 🧠
   add          add 🧠
   clear        remove 🧠
-               
+
 Run 'gif meta COMMAND --help' for more information on a command.
 ```
 
