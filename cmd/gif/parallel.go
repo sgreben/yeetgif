@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/schollz/progressbar"
+	"github.com/schollz/progressbar/v2"
 )
 
 func newLabeledProgressBar(n int, label ...string) *progressbar.ProgressBar {
