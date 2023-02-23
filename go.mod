@@ -11,7 +11,7 @@ require (
 	github.com/schollz/progressbar/v2 v2.15.0
 	github.com/sgreben/piecewiselinear v0.0.0-20181031011718-3af66faddc7f
 	golang.org/x/image v0.0.0-20181030002151-69cc3646b96e
-	golang.org/x/text v0.3.0
+	golang.org/x/text v0.3.8
 )
 
 require (

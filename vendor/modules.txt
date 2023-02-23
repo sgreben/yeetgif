@@ -49,6 +49,6 @@ golang.org/x/image/math/f64
 golang.org/x/image/math/fixed
 golang.org/x/image/tiff
 golang.org/x/image/tiff/lzw
-# golang.org/x/text v0.3.0
-## explicit
+# golang.org/x/text v0.3.8
+## explicit; go 1.17
 golang.org/x/text/unicode/runenames
